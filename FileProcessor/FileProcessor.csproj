@@ -53,6 +53,7 @@
     <Compile Include="Decryption.cs" />
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FunctionTools.cs" />
+    <Compile Include="Sweeper.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

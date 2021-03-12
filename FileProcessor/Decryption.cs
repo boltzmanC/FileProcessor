@@ -26,9 +26,13 @@ namespace FileProcessor
             if (Directory.Exists(enteredpath) == true)
             {
 
+
+
             }
             else if (File.Exists(enteredpath) == true)
             {
+
+
 
             }
             else
@@ -36,9 +40,6 @@ namespace FileProcessor
                 Console.WriteLine($"Entered string, {enteredpath}, is not a valid input.");
                 Console.WriteLine();
             }
-            
-
-
 
         }
 
@@ -116,6 +117,7 @@ namespace FileProcessor
         }
 
 
+        //Bouncy Castle (will require no additional software)
 
         //public void FileDecryptBouncyCastle()
         //{

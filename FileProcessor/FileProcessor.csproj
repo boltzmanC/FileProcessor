@@ -50,6 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckedFileList.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CheckedFileList.resx</DependentUpon>
+    </Compile>
     <Compile Include="Decryption.cs" />
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FunctionTools.cs" />
@@ -60,6 +65,15 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CheckedFileList.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CheckedFileList.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

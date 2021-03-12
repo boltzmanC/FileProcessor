@@ -7,9 +7,9 @@ using System.IO;
 
 namespace FileProcessor
 {
-    class Processor
+    public class Processor
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             //what would you like to do.
 
@@ -36,7 +36,7 @@ namespace FileProcessor
                     break;
 
                 case "exit":
-                    Environment.Exit(0);
+                    FunctionTools.ExitApp();
                     break;
             }
         }

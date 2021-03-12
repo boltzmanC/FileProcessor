@@ -11,10 +11,11 @@ namespace FileProcessor
     public class Decryption
     {
 
-        public void AutoDetectDecrypt()
+        public void AutoDetectDecryptFTP()
         {
             string directory = "";
 
+            // use Sweeper
 
 
         }
@@ -82,7 +83,7 @@ namespace FileProcessor
                 Console.ResetColor();
                 Console.WriteLine(@"Directory Not Found: C:\targus\tds\pgp");
 
-                FunctionTools.Exit();
+                FunctionTools.ExitApp();
             }
 
             Console.ResetColor();
@@ -110,7 +111,7 @@ namespace FileProcessor
                 Console.ResetColor();
                 Console.WriteLine(@"Directory Not Found: C:\targus\tds\pgp");
 
-                FunctionTools.Exit();
+                FunctionTools.ExitApp();
             }
 
             Console.ResetColor();

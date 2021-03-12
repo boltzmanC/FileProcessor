@@ -212,9 +212,49 @@ namespace FileProcessor
             Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
         }
 
+        public static void FTPOnboardingLogin(FtpClient client)
+        {
+            try
+            {
+                // HOST
+                client.Host = "onboarding.neustar.biz";
+
+                //Credentials
+                Console.WriteLine($"Enter UN and PW for {client.Host}");
+                Console.Write("User Name: ");
+                string user = Console.ReadLine().Trim();
+                Console.Write("Password: ");
+                string password = Console.ReadLine().Trim();
+
+                //login
+                client.Credentials = new System.Net.NetworkCredential(user, password);
+                client.Connect();
+                Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+
+                // attempt relog.
+                Console.Write("Would you like to attempt login again? (y/n): ");
+                string relogprompt = Console.ReadLine().Trim().ToLower();
+
+                if (relogprompt == "y")
+                {
+                    FunctionTools.FTPOnboardingLogin(client);
+                }
+                //else
+                //{
+                //    // back to the beginning.
+                //    //Processor;
+                //}
+            }
+            
+        }
+
 
         // exit
-        public static void Exit()
+        public static void ExitApp()
         {
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();

@@ -10,6 +10,12 @@ namespace FileProcessor
 {
     public class Decryption
     {
+        public static void DecryptFileStart()
+        {
+            string file = FunctionTools.GetAFile();
+            FileDecryptConsole(file);
+        }
+
 
         public void AutoDetectDecryptFTP()
         {
@@ -61,29 +67,59 @@ namespace FileProcessor
             //}
         }
 
-        public void FileDecryptConsole(string filepath)
+        public static void FileDecryptConsole(string filepath)
         {
             // this uses the existing JAVA decryption method. Having these files is a prerequisite to running this program.
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Cyan;
 
             // take in file and get name without pgp extention
+            string parentdirectory = FunctionTools.GetParentFolder(filepath);
             string newfilepath = FunctionTools.GetFileNameWithoutExtension(filepath);
+            newfilepath = parentdirectory + newfilepath;
 
             // run command line commands
             string targusdirectorycheck = @"C:\targus\tds\pgp";
 
             if (Directory.Exists(targusdirectorycheck))
             {
-                string executedecryption = $@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {filepath} {newfilepath}";
-                Process.Start("CMD.exe", executedecryption);
+                string executedecryption = String.Format(@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {0} {1}", filepath, newfilepath);
+
+                try
+                {
+                    // define command
+                    Process decryptcommand = new Process();
+                    decryptcommand.StartInfo.FileName = "cmd.exe";
+                    decryptcommand.StartInfo.Arguments = "/c " + executedecryption;
+                    decryptcommand.StartInfo.UseShellExecute = false;
+                    decryptcommand.StartInfo.CreateNoWindow = true;
+                    decryptcommand.StartInfo.RedirectStandardOutput = true;
+                    decryptcommand.StartInfo.RedirectStandardError = true;
+                    //decryptcommand.StartInfo.RedirectStandardInput = true;
+
+                    decryptcommand.Start();
+
+                    //write output to console
+                    while (!decryptcommand.StandardOutput.EndOfStream)
+                    {
+                        Console.WriteLine(decryptcommand.StandardOutput.ReadLine());
+                    }
+
+                    //write to console in one block
+                    //string output = decryptcommand.StandardOutput.ReadToEnd();
+                    //Console.WriteLine(output);
+
+                    //decryptcommand.WaitForExit();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Exception: {e.Message}");
+                }                
             }
             else
             {
                 Console.ResetColor();
                 Console.WriteLine(@"Directory Not Found: C:\targus\tds\pgp");
-
-                FunctionTools.ExitApp();
             }
 
             Console.ResetColor();
@@ -91,30 +127,7 @@ namespace FileProcessor
 
         public void FileEncryptConsole(string filepath)
         {
-            // this uses the existing JAVA decryption method. Having these files is a prerequisite to running this program.
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            // take in file and get name without pgp extention
-            string newfilepath = FunctionTools.GetFileNameWithoutExtension(filepath);
-
-            // run command line commands
-            string targusdirectorycheck = @"C:\targus\tds\pgp";
-
-            if (Directory.Exists(targusdirectorycheck))
-            {
-                string executedecryption = $@"C:\targus\tds\pgp\e1pgp.bat encrypt tdssys {filepath} {newfilepath}";
-                Process.Start("CMD.exe", executedecryption);
-            }
-            else
-            {
-                Console.ResetColor();
-                Console.WriteLine(@"Directory Not Found: C:\targus\tds\pgp");
-
-                FunctionTools.ExitApp();
-            }
-
-            Console.ResetColor();
+            
         }
 
 

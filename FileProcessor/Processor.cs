@@ -11,33 +11,71 @@ namespace FileProcessor
     {
         public static void Main(string[] args)
         {
-            //what would you like to do.
+            //setconsole size
+            Console.SetWindowSize(150, 45);
+            int bufferwidth = Console.BufferWidth;
+            int bufferheight = 600;
+            Console.SetBufferSize(bufferwidth, bufferheight);
 
-            Console.WriteLine();
-            Console.WriteLine("Select a process:");
-            Console.WriteLine("{0,5}{1,-10}", "1. ", "Decrypt file or files in target directory.");
-            Console.WriteLine("{0,5}{1,-10}", "2. ", "Test file format against definition file.");
-            Console.WriteLine("{0,5}{1,-10}", "3. ", "");
-            Console.WriteLine("{0,5}{1,-10}", "4. ", "");
-            Console.WriteLine("{0,5}{1,-10}", "5. ", "");
+            //GO
+            ProcessorStartMenu();
+        }
 
-            Console.WriteLine("{0,5}", "exit");
+        public static void ProcessorStartMenu()
+        {
+            // start menu
+            bool done = false;
 
-            Console.WriteLine();
-            Console.Write("Selection: ");
-            string input = Console.ReadLine().ToUpper();
-
-            string definitionfilepath = string.Empty;
-
-            switch (input)
+            while (done != true)
             {
-                case "1":
-                    
-                    break;
+                //what would you like to do.
 
-                case "exit":
-                    FunctionTools.ExitApp();
-                    break;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine();
+                Console.WriteLine("Select a process:");
+                Console.WriteLine("{0,5}{1,-10}", "1. ", "Open HowTO Confluence Page.");
+                Console.WriteLine("{0,5}{1,-10}", "2. ", "Decrypt file or files in target directory.");
+                Console.WriteLine("{0,5}{1,-10}", "3. ", "Test file format against definition file.");
+                //Console.WriteLine("{0,5}{1,-10}", "4. ", "");
+                //Console.WriteLine("{0,5}{1,-10}", "5. ", "");
+                //Console.WriteLine("{0,5}{1,-10}", "6. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
+                Console.WriteLine();
+                Console.ResetColor();
+                //Get user input.
+                Console.Write("Selection: ");
+                string input = Console.ReadLine();
+                
+
+                switch (input)
+                {
+                    case "1":
+                        //System.Diagnostics.Process.Start("insert webpage url here");
+                        Console.WriteLine("Not implemented yet.");
+                        break;
+
+                    case "2":
+                        Decryption.DecryptFileStart();
+                        break;
+
+                    case "3":
+                        DefinitionFileTester.E1PlatformFileTester();
+                        break;
+
+
+
+                    // exit
+                    case "exit":
+                        done = true; // we are done but manually exit app here.
+                        FunctionTools.ExitApp();
+                        break;
+
+                    default:
+                        Console.WriteLine("not a valid input");
+                        ProcessorStartMenu();
+                        break;
+
+                }
             }
         }
     }

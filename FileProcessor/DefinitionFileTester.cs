@@ -10,27 +10,33 @@ namespace FileProcessor
 {
     public class DefinitionFileTester
     {
-        static public void E1PlatformFileTester()
+        public static void E1PlatformFileTester()
         {
             //select definition file
             string definitionfilepath = E1PlatformSelectDefinitionFile();
-            
+
             //login to FTPClient
             FtpClient client = new FtpClient();
             FunctionTools.FTPE1platformLogin(client);
 
             //test target file and definition file. 
-            DownloadAndTestDefinitionFile(client, definitionfilepath);
+            string inputfile = DownloadAndTestDefinitionFile(client, definitionfilepath);
 
             client.Disconnect();
+
+            //Generate test file
+            GenerateTestFile(inputfile);
         }
 
-        static public string E1PlatformSelectDefinitionFile()
+
+
+        // tools
+        public static string E1PlatformSelectDefinitionFile()
         {
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("Select definition file to test against on the e1platform FTP");
-            Console.ResetColor();
+            
 
             Console.WriteLine();
             Console.WriteLine("Select definition file:");
@@ -47,6 +53,7 @@ namespace FileProcessor
             Console.WriteLine("{0,5}{1,-10}", "11. ", "michelin");
 
             Console.WriteLine("{0,5}", "exit");
+            Console.ResetColor();
 
             Console.WriteLine();
             Console.Write("Definition File: ");
@@ -109,7 +116,7 @@ namespace FileProcessor
             return definitionfilepath;
         }
 
-        static public void DownloadAndTestDefinitionFile(FtpClient client, string definitionfilepath)
+        public static string DownloadAndTestDefinitionFile(FtpClient client, string definitionfilepath)
         {
             //download definition file.
             string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
@@ -149,7 +156,7 @@ namespace FileProcessor
             }
 
             //Get file to test
-            Console.WriteLine("File to Test.");
+            Console.WriteLine("File to Test:");
             string file = FunctionTools.GetAFile();
             char delimiter = FunctionTools.GetDelimiter();
             char txtq = FunctionTools.GetTXTQualifier();
@@ -289,11 +296,61 @@ namespace FileProcessor
                     }
                 }
             }
+
+            return file;
         }
 
+        // test files
+        public static void GenerateTestFile(string inputfile)
+        {
+            Console.WriteLine("Generate Test File (y/n)?: ");
+            string generatefileinput = Console.ReadLine().ToLower().Trim();
 
+            if (generatefileinput == "y")
+            {
+                GetSubsetOfRecords(inputfile);
+            }
+        }
 
+        public static void GetSubsetOfRecords(string filepath)  //get subset of file.
+        {
+            //default # of records to read. in the future can make this based on file length. 
+            int numbertoread = 10000;
+            
+            string filename = FunctionTools.GetFileNameWithoutExtension(filepath);
+            string outfile = Directory.GetParent(filepath) + "\\" + filename + "_subset" + "_" + numbertoread + ".txt";
 
+            //fix int for reading file.
+            numbertoread -= 1;
 
+            using (StreamWriter writeto = new StreamWriter(outfile))
+            {
+                using (StreamReader readfile = new StreamReader(filepath))
+                {
+                    string header = readfile.ReadLine();
+                    writeto.WriteLine(header);
+
+                    int countlines = 0;
+                    string line;
+                    while ((line = readfile.ReadLine()) != null && countlines <= numbertoread)
+                    {
+                        writeto.WriteLine(line);
+
+                        countlines++;
+                    }
+
+                    if (countlines < numbertoread)
+                    {
+                        Console.WriteLine("Lines requested - {0}. Lines read - {1}", numbertoread, countlines);
+                    }
+                }
+            }
+
+            //Write Output to console
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"Output file created: {outfile}");
+            Console.ResetColor();
+            Console.WriteLine();
+        }
     }
 }

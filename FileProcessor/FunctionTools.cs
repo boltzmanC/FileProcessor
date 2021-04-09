@@ -206,10 +206,14 @@ namespace FileProcessor
 
         public static void FTPE1platformLogin(FtpClient client) //be sure to logout in line
         {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Cyan;
             client.Host = "download.targusinfo.com";
             client.Credentials = new System.Net.NetworkCredential("e1platform", "Tu5wq$m4loPav");
             client.Connect();
             Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
         public static void FTPOnboardingLogin(FtpClient client)

@@ -35,11 +35,11 @@ namespace FileProcessor
         {
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("Select definition file to test against on the e1platform FTP");
+            Console.WriteLine("Select definition file to test against on the e1platform FTP: ");
             
 
-            Console.WriteLine();
-            Console.WriteLine("Select definition file:");
+            //Console.WriteLine();
+            //Console.WriteLine("Select definition file:");
             Console.WriteLine("{0,5}{1,-10}", "1. ", "CCNA");
             Console.WriteLine("{0,5}{1,-10}", "2. ", "Chickfila");
             Console.WriteLine("{0,5}{1,-10}", "3. ", "Discount Tire");
@@ -52,7 +52,7 @@ namespace FileProcessor
             Console.WriteLine("{0,5}{1,-10}", "10. ", "Edelman - StatSocial");
             Console.WriteLine("{0,5}{1,-10}", "11. ", "michelin");
 
-            Console.WriteLine("{0,5}", "exit");
+            Console.WriteLine("{0,5}{1,-10}", "exit: ", "exit");
             Console.ResetColor();
 
             Console.WriteLine();
@@ -178,7 +178,10 @@ namespace FileProcessor
 
                 if (columnnamesupper.Count() == headersplitupper.Count())
                 {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("File number of columns EQUAL definition columns.");
+                    Console.ResetColor();
+                    Console.WriteLine();
 
                     foreach (var column in headersplit)
                     {
@@ -186,8 +189,14 @@ namespace FileProcessor
 
                         if (column.ToUpper() != columnnamesupper[index].ToUpper()) //upper
                         {
-                            Console.WriteLine("file column -{2}- no match: {0} - {1}", column, columnnames[index], index + 1);
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("BUT column names do not match definition file:");
+                            Console.WriteLine($"file column -{index + 1}- no match: {column} -> {columnnames[index]}");
                             matched = false;
+
+                            Console.ResetColor();
+                            Console.WriteLine();
                         }
                     }
                 }
@@ -195,8 +204,10 @@ namespace FileProcessor
                 {
                     int columndiff = headersplitupper.Count() - columnnamesupper.Count();
 
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("File number of columns GREATER THAN definition columns.");
                     Console.WriteLine("{0} - extra columns in new file.", columndiff);
+                    
 
                     int columncount = 1;
                     foreach (var column in headersplit)
@@ -209,9 +220,12 @@ namespace FileProcessor
                     }
 
                     morecolumns = true;
+                    Console.ResetColor();
+                    Console.WriteLine();
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("File number of columns LESS THAN definition columns.");
 
                     int columncount = 1;
@@ -225,6 +239,8 @@ namespace FileProcessor
                     }
 
                     lesscolumns = true;
+                    Console.ResetColor();
+                    Console.WriteLine();
                 }
 
                 if (matched == false) //same number of columns but different order or +/- column.
@@ -264,6 +280,7 @@ namespace FileProcessor
                             }
                         }
                     }
+                    Console.WriteLine();
                 }
 
                 if (morecolumns == true || lesscolumns == true)
@@ -294,6 +311,7 @@ namespace FileProcessor
                             }
                         }
                     }
+                    Console.WriteLine();
                 }
             }
 
@@ -303,13 +321,15 @@ namespace FileProcessor
         // test files
         public static void GenerateTestFile(string inputfile)
         {
-            Console.WriteLine("Generate Test File (y/n)?: ");
+            Console.Write("Generate Test File (y/n)?: ");
             string generatefileinput = Console.ReadLine().ToLower().Trim();
+            Console.WriteLine();
 
             if (generatefileinput == "y")
             {
                 GetSubsetOfRecords(inputfile);
             }
+            
         }
 
         public static void GetSubsetOfRecords(string filepath)  //get subset of file.
@@ -352,5 +372,128 @@ namespace FileProcessor
             Console.ResetColor();
             Console.WriteLine();
         }
+
+        public static void GenerateNewDefinitionFile()
+        {
+            // get user fileinfo
+            string file = FunctionTools.GetAFile();
+            char delimiter = FunctionTools.GetDelimiter();
+            char txtq = FunctionTools.GetTXTQualifier();
+
+            //save directory
+            string filesavepath = Directory.GetParent(file).ToString();
+            //DirectoryInfo filesavepath = Directory.GetParent(file);
+
+            // save to file location or desktop?
+            Console.Write("Save .definition to same location as source file? (y/n): ");
+            string savetodesktop = Console.ReadLine().Trim().ToLower();
+            
+
+            if (savetodesktop == "n")
+            {
+                filesavepath = FunctionTools.GetDesktopDirectory().ToString();
+                
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"Path for new definition file: {filesavepath}");
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"Path for new definition file: {filesavepath}");
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+
+            // ask user to set table name
+            Console.Write("Enter table name to be used in e1x: ");
+            string tablename = Console.ReadLine();
+
+            //additional settings... wont change for now. 
+            string definitionfilefirstline = "#FTP Automation Definition";
+            string operation = "reload";
+            string skipfirstrow = "true";
+            string purgedefinition = "false";
+            string emailresultsto = "dylan.white@team.neustar,e1@support.neustar";
+
+
+            // column list for definition file
+            List<string> columnnames = new List<string>();
+            
+            // read file header
+            using (StreamReader readfile = new StreamReader(file))
+            {
+                string readfirstline = readfile.ReadLine();
+
+                string[] splitline = FunctionTools.SplitLineWithTxtQualifier(readfirstline, delimiter, txtq, false);
+
+                foreach (var column in splitline)
+                {
+                    columnnames.Add(column.ToUpper().Trim());
+                }
+            }
+
+            // create definition file based on template.
+            string newdefinitionfilename = $"{tablename}_reload.definition";
+            string definitionfile = Path.Combine(filesavepath, newdefinitionfilename);
+
+            using (StreamWriter writefile = new StreamWriter(definitionfile))
+            {
+                writefile.WriteLine(definitionfilefirstline);
+                writefile.WriteLine($"tablename = {tablename}");
+                writefile.WriteLine($"operation = {operation}");
+                writefile.WriteLine($"skipfirstrow = {skipfirstrow}");
+                writefile.WriteLine($"delimiter = {delimiter}");
+                writefile.WriteLine($"textqualifier = {txtq}");
+                writefile.WriteLine($"purgedefinition = {purgedefinition}");
+                writefile.WriteLine($"emailresultsto = {emailresultsto}");
+                
+                //columnfields
+                for (int i = 1; i <= columnnames.Count(); i++)
+                {
+                    writefile.WriteLine($"column{i}.fieldname = {columnnames[i - 1]}");
+                }
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"Definition file has been created: {definitionfile}");
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+
+            //preview and change definition file.
+            Console.Write("Preview definition file? (y/n): ");
+            string preview = Console.ReadLine().ToLower().Trim();
+
+            if (preview == "y")
+            {
+                using (StreamReader readdefinitionfile = new StreamReader(definitionfile))
+                {
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+
+                    string line = string.Empty;
+                    while ((line = readdefinitionfile.ReadLine()) != null)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+
+            Console.Write("Do any changes need to be made? (y/n): ");
+            string changes = Console.ReadLine().ToLower().Trim();
+
+            if (changes == "y")
+            {
+                //startover
+                Console.WriteLine("OK we will start again...");
+                GenerateNewDefinitionFile();
+            }
+
+        }
+
     }
 }

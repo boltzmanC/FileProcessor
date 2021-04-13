@@ -211,6 +211,7 @@ namespace FileProcessor
             client.Host = "download.targusinfo.com";
             client.Credentials = new System.Net.NetworkCredential("e1platform", "Tu5wq$m4loPav");
             client.Connect();
+            Console.WriteLine("Signing into FTP site...");
             Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
             Console.ResetColor();
             Console.WriteLine();
@@ -222,6 +223,10 @@ namespace FileProcessor
             {
                 // HOST
                 client.Host = "onboarding.neustar.biz";
+                //client.Port = 22;
+                client.EncryptionMode = FtpEncryptionMode.Implicit;
+                //client.SslProtocols = SslProtocols.Tls12;
+
 
                 //Credentials
                 Console.WriteLine($"Enter UN and PW for {client.Host}");

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using FluentFTP;
 
 namespace FileProcessor
 {
@@ -19,6 +20,11 @@ namespace FileProcessor
 
             //GO
             ProcessorStartMenu();
+
+            //login to FTPClient
+            //FtpClient client = new FtpClient();
+            //FunctionTools.FTPOnboardingLogin(client);
+            //client.Disconnect();
         }
 
         public static void ProcessorStartMenu()
@@ -36,7 +42,7 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "1. ", "Open HowTO Confluence Page.");
                 Console.WriteLine("{0,5}{1,-10}", "2. ", "Decrypt file or files in target directory.");
                 Console.WriteLine("{0,5}{1,-10}", "3. ", "Test file format against definition file.");
-                //Console.WriteLine("{0,5}{1,-10}", "4. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "4. ", "Generate new .definition file.");
                 //Console.WriteLine("{0,5}{1,-10}", "5. ", "");
                 //Console.WriteLine("{0,5}{1,-10}", "6. ", "");
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
@@ -62,6 +68,9 @@ namespace FileProcessor
                         DefinitionFileTester.E1PlatformFileTester();
                         break;
 
+                    case "4":
+                        DefinitionFileTester.GenerateNewDefinitionFile();
+                        break;
 
 
                     // exit

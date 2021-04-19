@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using FluentFTP;
+using WinSCP;
+using System.Diagnostics;
 
 namespace FileProcessor
 {
@@ -16,16 +17,39 @@ namespace FileProcessor
             string definitionfilepath = E1PlatformSelectDefinitionFile();
 
             //login to FTPClient
-            FtpClient client = new FtpClient();
-            FunctionTools.FTPE1platformLogin(client);
+            using (Session session = new Session())
+            {
+                // Connect
+                int attempts = 3;
+                do
+                {
+                    try
+                    {
+                        Console.WriteLine("Connecting to download.targus.info...");
+                        session.Open(FTPLogins.E1Platform());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write($"Failed to connect - {e}");
+                        if (attempts == 0)
+                        {
+                            // give up
+                            Console.WriteLine("I give up...");
+                            throw;
+                        }
+                    }
+                    attempts--;
+                }
+                while (!session.Opened);
 
-            //test target file and definition file. 
-            string inputfile = DownloadAndTestDefinitionFile(client, definitionfilepath);
+                Console.WriteLine("Connected.");
 
-            client.Disconnect();
+                //test target file and definition file. 
+                string inputfile = DownloadAndTestDefinitionFile(session, definitionfilepath);
 
-            //Generate test file
-            GenerateTestFile(inputfile);
+                //Generate test file
+                GenerateTestFile(inputfile);
+            }
         }
 
 
@@ -116,11 +140,11 @@ namespace FileProcessor
             return definitionfilepath;
         }
 
-        public static string DownloadAndTestDefinitionFile(FtpClient client, string definitionfilepath)
+        public static string DownloadAndTestDefinitionFile(Session session, string definitionfilepath)
         {
             //download definition file.
             string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
-            client.DownloadFile(tempdefinitionfile, definitionfilepath);
+            session.GetFiles(definitionfilepath, tempdefinitionfile);
 
             List<string> fileinfo = new List<string>();
             List<string> columnnames = new List<string>();
@@ -373,6 +397,52 @@ namespace FileProcessor
             Console.WriteLine();
         }
 
+        public static void GetSubsetOfRecordsStandAlone()
+        {
+            //get file
+            string filepath = FunctionTools.GetAFile();
+            int numbertoread = FunctionTools.GetANumber();
+            
+            
+            //default # of records to read. in the future can make this based on file length. 
+            //int numbertoread = 10000;
+
+            string filename = FunctionTools.GetFileNameWithoutExtension(filepath);
+            string outfile = Directory.GetParent(filepath) + "\\" + filename + "_subset" + "_" + numbertoread + ".txt";
+
+            //fix int for reading file.
+            numbertoread -= 1;
+
+            using (StreamWriter writeto = new StreamWriter(outfile))
+            {
+                using (StreamReader readfile = new StreamReader(filepath))
+                {
+                    string header = readfile.ReadLine();
+                    writeto.WriteLine(header);
+
+                    int countlines = 0;
+                    string line;
+                    while ((line = readfile.ReadLine()) != null && countlines <= numbertoread)
+                    {
+                        writeto.WriteLine(line);
+
+                        countlines++;
+                    }
+
+                    if (countlines < numbertoread)
+                    {
+                        Console.WriteLine("Lines requested - {0}. Lines read - {1}", numbertoread, countlines);
+                    }
+                }
+            }
+
+            //Write Output to console
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"Output file created: {outfile}");
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
         public static void GenerateNewDefinitionFile()
         {
             // get user fileinfo
@@ -415,6 +485,7 @@ namespace FileProcessor
             string operation = "reload";
             string skipfirstrow = "true";
             string purgedefinition = "false";
+            string operationmonitorhours = "17";
             string emailresultsto = "dylan.white@team.neustar,e1@support.neustar";
 
 
@@ -447,6 +518,7 @@ namespace FileProcessor
                 writefile.WriteLine($"delimiter = {delimiter}");
                 writefile.WriteLine($"textqualifier = {txtq}");
                 writefile.WriteLine($"purgedefinition = {purgedefinition}");
+                writefile.WriteLine($"operationmonitorhours = {operationmonitorhours}");
                 writefile.WriteLine($"emailresultsto = {emailresultsto}");
                 
                 //columnfields

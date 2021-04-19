@@ -17,16 +17,6 @@ namespace FileProcessor
         }
 
 
-        public void AutoDetectDecryptFTP()
-        {
-            string directory = "";
-
-            // use Sweeper
-
-
-        }
-
-
 
         public void DecryptDirectoryFilesorFile(string enteredpath)
         {

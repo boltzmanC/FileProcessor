@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
-using FluentFTP;
+using System.Diagnostics;
+using WinSCP;
 
 namespace FileProcessor
 {
@@ -67,7 +68,24 @@ namespace FileProcessor
 
             return splitchar;
         }
-                
+
+        public static int GetANumber()
+        {
+            Console.Write("Enter a number (Int32): ");
+            string input = Console.ReadLine().Trim();
+
+            int number = 0;
+            if (int.TryParse(input, out number))
+            {
+                return number;
+            }
+            else
+            {
+                Console.WriteLine("Not a valid number. Try again...");
+                return GetANumber();
+            }
+        }
+
         static public string[] SplitLineWithTxtQualifier(string expression, char delimiter, char qualifier, bool ignoreCase) //true -> sets everything to lower.
         {
             if (ignoreCase)
@@ -204,63 +222,7 @@ namespace FileProcessor
             }
         }
 
-        public static void FTPE1platformLogin(FtpClient client) //be sure to logout in line
-        {
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            client.Host = "download.targusinfo.com";
-            client.Credentials = new System.Net.NetworkCredential("e1platform", "Tu5wq$m4loPav");
-            client.Connect();
-            Console.WriteLine("Signing into FTP site...");
-            Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
-            Console.ResetColor();
-            Console.WriteLine();
-        }
-
-        public static void FTPOnboardingLogin(FtpClient client)
-        {
-            try
-            {
-                // HOST
-                client.Host = "onboarding.neustar.biz";
-                //client.Port = 22;
-                client.EncryptionMode = FtpEncryptionMode.Implicit;
-                //client.SslProtocols = SslProtocols.Tls12;
-
-
-                //Credentials
-                Console.WriteLine($"Enter UN and PW for {client.Host}");
-                Console.Write("User Name: ");
-                string user = Console.ReadLine().Trim();
-                Console.Write("Password: ");
-                string password = Console.ReadLine().Trim();
-
-                //login
-                client.Credentials = new System.Net.NetworkCredential(user, password);
-                client.Connect();
-                Console.WriteLine("Connected {0}.", client.IsConnected); //https://github.com/robinrodricks/FluentFTP/wiki/FTPS-Connection
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-
-                // attempt relog.
-                Console.Write("Would you like to attempt login again? (y/n): ");
-                string relogprompt = Console.ReadLine().Trim().ToLower();
-
-                if (relogprompt == "y")
-                {
-                    FunctionTools.FTPOnboardingLogin(client);
-                }
-                //else
-                //{
-                //    // back to the beginning.
-                //    //Processor;
-                //}
-            }
-            
-        }
-
+        
 
         // exit
         public static void ExitApp()

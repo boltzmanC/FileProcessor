@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using FluentFTP;
 
 namespace FileProcessor
 {
@@ -22,6 +21,8 @@ namespace FileProcessor
             ProcessorStartMenu();
 
             //login to FTPClient
+            //Sweeper.AutoOnBoardingFTPSweeper();
+
             //FtpClient client = new FtpClient();
             //FunctionTools.FTPOnboardingLogin(client);
             //client.Disconnect();
@@ -43,7 +44,7 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "2. ", "Decrypt file or files in target directory.");
                 Console.WriteLine("{0,5}{1,-10}", "3. ", "Test file format against definition file.");
                 Console.WriteLine("{0,5}{1,-10}", "4. ", "Generate new .definition file.");
-                //Console.WriteLine("{0,5}{1,-10}", "5. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "5. ", "Get subset of records");
                 //Console.WriteLine("{0,5}{1,-10}", "6. ", "");
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();
@@ -70,6 +71,10 @@ namespace FileProcessor
 
                     case "4":
                         DefinitionFileTester.GenerateNewDefinitionFile();
+                        break;
+
+                    case "5":
+                        DefinitionFileTester.GetSubsetOfRecordsStandAlone();
                         break;
 
 

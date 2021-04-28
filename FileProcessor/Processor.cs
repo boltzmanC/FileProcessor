@@ -18,14 +18,11 @@ namespace FileProcessor
             Console.SetBufferSize(bufferwidth, bufferheight);
 
             //GO
-            ProcessorStartMenu();
+            //ProcessorStartMenu();
 
-            //login to FTPClient
-            //Sweeper.AutoOnBoardingFTPSweeper();
+            //sweeper
+            Sweeper.AutoOnBoardingFTPSweeper();
 
-            //FtpClient client = new FtpClient();
-            //FunctionTools.FTPOnboardingLogin(client);
-            //client.Disconnect();
         }
 
         public static void ProcessorStartMenu()
@@ -49,11 +46,10 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();
                 Console.ResetColor();
+                
                 //Get user input.
                 Console.Write("Selection: ");
                 string input = Console.ReadLine();
-                
-
                 switch (input)
                 {
                     case "1":

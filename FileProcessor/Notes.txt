@@ -1,8 +1,0 @@
-﻿Notes:
-
-
-Processor:
-	Has Main method that will be the starting point for all jobs. 
-
-Decryption: 
-	

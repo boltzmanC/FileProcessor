@@ -185,6 +185,8 @@ namespace FileProcessor
             char delimiter = FunctionTools.GetDelimiter();
             char txtq = FunctionTools.GetTXTQualifier();
 
+            string newdefinitionfilepath = Directory.GetParent(file) + "\\" + "NEW_" + definitionfilepath.Split('/').Last();
+
             using (StreamReader readfile = new StreamReader(file))
             {
                 bool matched = true;
@@ -288,7 +290,7 @@ namespace FileProcessor
                             }
                         }
 
-                        using (StreamWriter newdefinitionfile = new StreamWriter(FunctionTools.GetDesktopDirectory() + "\\" + definitionfilepath.Split('/').Last()))
+                        using (StreamWriter newdefinitionfile = new StreamWriter(newdefinitionfilepath))
                         {
                             foreach (var value in fileinfo)
                             {
@@ -304,17 +306,20 @@ namespace FileProcessor
                             }
                         }
                     }
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
+                    Console.ResetColor();
                     Console.WriteLine();
                 }
 
                 if (morecolumns == true || lesscolumns == true)
                 {
-                    Console.Write("Generating list of columns from target file headers? (y/n): ");
+                    Console.Write("Generating new .definition with new file header? (y/n): ");
                     string yesno = Console.ReadLine().ToUpper();
 
                     if (yesno.ToUpper() == "y".ToUpper())
                     {
-                        using (StreamWriter newdefinitionfile = new StreamWriter(FunctionTools.GetDesktopDirectory() + "\\newcolumnlistfordefinitionfile.txt"))
+                        using (StreamWriter newdefinitionfile = new StreamWriter(newdefinitionfilepath))
                         {
                             newdefinitionfile.WriteLine("Target file column List");
                             newdefinitionfile.WriteLine();
@@ -335,6 +340,9 @@ namespace FileProcessor
                             }
                         }
                     }
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
+                    Console.ResetColor();
                     Console.WriteLine();
                 }
             }
@@ -347,7 +355,6 @@ namespace FileProcessor
         {
             Console.Write("Generate Test File (y/n)?: ");
             string generatefileinput = Console.ReadLine().ToLower().Trim();
-            Console.WriteLine();
 
             if (generatefileinput == "y")
             {

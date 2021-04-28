@@ -61,6 +61,16 @@
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FTPLogins.cs" />
     <Compile Include="FunctionTools.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\e1analyticsinternalpersistent.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>e1analyticsinternalpersistent.resx</DependentUpon>
+    </Compile>
     <Compile Include="Sweeper.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,13 +80,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Notes.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="CheckedFileList.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CheckedFileList.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\e1analyticsinternalpersistent.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>e1analyticsinternalpersistent.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="E1AnalyticsInternalFileList.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.17.10\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.17.10\build\WinSCP.targets')" />

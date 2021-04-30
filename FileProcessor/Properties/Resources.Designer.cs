@@ -59,14 +59,5 @@ namespace FileProcessor.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string E1AnalyticsInternalFileList {
-            get {
-                return ResourceManager.GetString("E1AnalyticsInternalFileList", resourceCulture);
-            }
-        }
     }
 }

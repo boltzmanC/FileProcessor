@@ -22,7 +22,7 @@ namespace FileProcessor
 
             //sweeper
             Sweeper.AutoOnBoardingFTPSweeper();
-
+            //Sweeper.OnboardingFTPWriteFileListToConsole();
         }
 
         public static void ProcessorStartMenu()

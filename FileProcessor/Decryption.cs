@@ -27,14 +27,14 @@ namespace FileProcessor
             // take in file and get name without pgp extention
             string parentdirectory = FunctionTools.GetParentFolder(filepath);
             string newfilepath = FunctionTools.GetFileNameWithoutExtension(filepath);
-            newfilepath = parentdirectory + newfilepath;
+            newfilepath = parentdirectory + @"\" + newfilepath;
 
             // run command line commands
             string targusdirectorycheck = @"C:\targus\tds\pgp";
 
             if (Directory.Exists(targusdirectorycheck))
             {
-                string executedecryption = String.Format(@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {0} {1}", filepath, newfilepath);
+                string executedecryption = String.Format($@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {filepath} {newfilepath}");
 
                 try
                 {
@@ -83,21 +83,21 @@ namespace FileProcessor
             // take in file and get name without pgp extention
             string parentdirectory = FunctionTools.GetParentFolder(filepath);
             string newfilepath = FunctionTools.GetFileNameWithoutExtension(filepath);
-            newfilepath = parentdirectory + newfilepath;
+            newfilepath = parentdirectory + @"\" + newfilepath;
 
             // run command line commands
             string targusdirectorycheck = @"C:\targus\tds\pgp";
 
             if (Directory.Exists(targusdirectorycheck))
             {
-                string executedecryption = String.Format(@"C:\targus\tds\pgp\e1pgp.bat encrypt tdssys {0} {1}", filepath, newfilepath);
+                string executeencryption = String.Format($@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {filepath} {newfilepath}");
 
                 try
                 {
                     // define command
                     Process decryptcommand = new Process();
                     decryptcommand.StartInfo.FileName = "cmd.exe";
-                    decryptcommand.StartInfo.Arguments = "/c " + executedecryption;
+                    decryptcommand.StartInfo.Arguments = "/c " + executeencryption;
                     decryptcommand.StartInfo.UseShellExecute = false;
                     decryptcommand.StartInfo.CreateNoWindow = true;
                     decryptcommand.StartInfo.RedirectStandardOutput = true;
@@ -134,23 +134,29 @@ namespace FileProcessor
         {
             // this uses the existing JAVA decryption method. Having these files is a prerequisite to running this program.
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"Downloading: {ftpfilepath}");
+            
 
             // download file and store on target drive / directory.
             session.GetFileToDirectory(ftpfilepath, targetdirectory, false); //https://winscp.net/eng/docs/library_session_getfiletodirectory
 
+            Console.WriteLine("Download complete...");
+
             // filepath of saved file.
-            string newfilepath = targetdirectory + Path.GetFileName(ftpfilepath);
+            string newfilepath = targetdirectory + @"\" + Path.GetFileName(ftpfilepath);
+            string decryptedfilepath = Directory.GetParent(newfilepath) + @"\" + FunctionTools.GetFileNameWithoutExtension(newfilepath);
 
             // run command line commands
             string targusdirectorycheck = @"C:\targus\tds\pgp";
 
             if (Directory.Exists(targusdirectorycheck))
             {
-                string executedecryption = String.Format(@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {0} {1}", newfilepath, FunctionTools.GetFileNameWithoutExtension(newfilepath));
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                string executedecryption = String.Format($@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {newfilepath} {decryptedfilepath}");
 
                 try
                 {
+                    
                     // define command
                     Process decryptcommand = new Process();
                     decryptcommand.StartInfo.FileName = "cmd.exe";

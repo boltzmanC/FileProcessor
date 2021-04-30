@@ -8,6 +8,7 @@ using WinSCP;
 using System.Diagnostics;
 using System.Reflection;
 using System.Resources;
+using System.Configuration;
 
 
 namespace FileProcessor
@@ -15,58 +16,49 @@ namespace FileProcessor
     public class Sweeper
     {
         private const char splitchar = '|';
+        private const string newlinesplit = "\r\n";
 
         public static void AutoOnBoardingFTPSweeper()
         {
-            // resource file location
-            // documentation https://www.codeproject.com/Questions/5274073/Read-text-from-resources-Csharp
-            string e1analyticsinternalfilelist = Properties.Resources.E1AnalyticsInternalFileList; 
-
             // e1analytics saved fileinfo dictionary.
             Dictionary<string, DateTime> e1analyticssavedfileinfo = new Dictionary<string, DateTime>();
 
-            // e1analytics new file info
+            // e1analytics ftp file info
             Dictionary<string, DateTime> e1analyticsftpfileinfo = new Dictionary<string, DateTime>();
 
+            // new files to download
+            Dictionary<string, DateTime> newfilestodownload = new Dictionary<string, DateTime>();
+
             //e1sas01
-            string e1sas = @"\\e1sas01\O\Client Files";
+            //string e1sas = @"\\e1sas01\O\Client Files";
             string ddrive = @"D:\";
 
+            // new files found
+            int newfilecount = 0;
+
+            // list files in INTERNAL directory.
+            string ftpdirectory = "/E1Analytics/internal";
 
             // read resouce file.
-            using (StreamReader resoucereader = new StreamReader(e1analyticsinternalfilelist))
+            string resourcefile = Directory.GetCurrentDirectory() + @"\E1AnalyticsInternalFileList.txt";
+            bool readresourcefile = false;
+
+            if (File.Exists(resourcefile))
             {
-                string line;
-
-                while ((line = resoucereader.ReadLine()) != null)
-                {
-                    try
-                    {
-                        string[] storedfileinfo = line.Split(splitchar);
-
-                        DateTime filedate = DateTime.Parse(storedfileinfo[1]);
-
-                        e1analyticssavedfileinfo.Add(storedfileinfo[0], filedate);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Failed to parse: ");
-                        Console.WriteLine(e);
-                    }
-                }
+                e1analyticssavedfileinfo = ResourceFileReader(resourcefile);
+                readresourcefile = true;
+            }
+            else
+            {
+                Console.WriteLine($"No resource file found, creating {resourcefile}");
+                File.Create(resourcefile);
             }
 
-            //login to onboarding
+            // login to onbaording
             using (Session session = new Session())
             {
-                int newfilecount = 0;
-
                 // Connect
                 int attempts = 3;
-
-                // list files in INTERNAL directory.
-                string ftpdirectory = "/E1Analytics/internal";
-
                 do
                 {
                     try
@@ -90,42 +82,45 @@ namespace FileProcessor
 
                 Console.WriteLine("Connected.");
 
-                // write out target drictory to console.
-                //WriteFileListToConsole(session, directory);
-
-
                 // read onboarding file list
                 try
                 {
                     Console.WriteLine($"Looking at: {ftpdirectory}");
                     RemoteDirectoryInfo directoryinfo = session.ListDirectory(ftpdirectory);
 
-                    int filecount = directoryinfo.Files.Count();
-
-                    Console.WriteLine($"There are {filecount} files in the directory.");
+                    int filecount = 0;
 
                     foreach (RemoteFileInfo fileinfo in directoryinfo.Files)
                     {
-                        string filename = fileinfo.FullName;
-                        DateTime filedate = fileinfo.LastWriteTime;
-                        
-                        if (e1analyticssavedfileinfo.ContainsKey(filename))
+                        if (fileinfo.IsDirectory == false)
                         {
-                            // same file name new version case                            
-                            int compareresult = DateTime.Compare(e1analyticssavedfileinfo[filename], filedate);
+                            // store all file info
+                            e1analyticsftpfileinfo.Add(fileinfo.FullName, fileinfo.LastWriteTime);
 
-                            if (compareresult > 0) //https://docs.microsoft.com/en-us/dotnet/api/system.datetime.compare?view=net-5.0#System_DateTime_Compare_System_DateTime_System_DateTime_
+                            if (e1analyticssavedfileinfo.ContainsKey(fileinfo.FullName) && readresourcefile == true)
                             {
-                                e1analyticsftpfileinfo.Add(filename, filedate);
+                                // same file name new version case                            
+                                int compareresult = DateTime.Compare(e1analyticssavedfileinfo[fileinfo.FullName], fileinfo.LastWriteTime);
+
+                                if (compareresult > 0) //https://docs.microsoft.com/en-us/dotnet/api/system.datetime.compare?view=net-5.0#System_DateTime_Compare_System_DateTime_System_DateTime_
+                                {
+                                    newfilestodownload.Add(fileinfo.FullName, fileinfo.LastWriteTime);
+                                }
                             }
-                        }
-                        else
-                        {
-                            // add FULL file name (includes path) and last write time to dictionary.
-                            e1analyticsftpfileinfo.Add(filename, filedate);
-                            newfilecount++;
+                            else if (!e1analyticssavedfileinfo.ContainsKey(fileinfo.FullName)) // only add if not already in the save file.
+                            {
+                                // add FULL file name (includes path) and last write time to dictionary.
+                                newfilestodownload.Add(fileinfo.FullName, fileinfo.LastWriteTime);
+                                newfilecount++;
+                            }
+
+                            filecount++;
                         }
                     }
+
+                    Console.WriteLine($"There are {filecount} files in the directory.");
+
+                    Console.WriteLine($"{newfilecount} - new files found in {ftpdirectory}");
                 }
                 catch (WinSCP.SessionException error)
                 {
@@ -136,86 +131,91 @@ namespace FileProcessor
                     Console.WriteLine(e.ToString());
                 }
 
-                Console.WriteLine($"{newfilecount} - new files found in {ftpdirectory}");
-
                 // get file paths that are to be downloaded.
-                List<string> filestodownload = SelectFilesToDownload(e1analyticsftpfileinfo);
+                List<string> filestodownload = SelectFilesToDownload(newfilestodownload);
 
                 // foreach file download and decrypt to the O drive. 
-                foreach (var file in filestodownload)
+                foreach (var filepath in filestodownload)
                 {
-                    Decryption.SweeperFileDownloadAndDecryptConsole(session, ftpdirectory, ddrive);
-                    
-                    if(e1analyticsftpfileinfo.ContainsKey(file))
+                    // foreach full file name, download and decrypt to target directory.
+                    Decryption.SweeperFileDownloadAndDecryptConsole(session, filepath, ddrive);
+                }
+
+            }
+
+            // update resouce file.
+            ResourceFileWriter(e1analyticssavedfileinfo, resourcefile);
+
+            
+
+            
+
+        }
+
+        public static void OnboardingFTPWriteFileListToConsole()
+        {
+            using (Session session = new Session())
+            {
+                string directory = "/E1Analytics/internal";
+
+                // Connect
+                int attempts = 3;
+                do
+                {
+                    try
                     {
-                        e1analyticssavedfileinfo.Add(file, e1analyticsftpfileinfo[file]);
+                        Console.WriteLine("Connecting to onboarding...");
+                        session.Open(FTPLogins.Onboarding());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write($"Failed to connect - {e}");
+                        if (attempts == 0)
+                        {
+                            // give up
+                            Console.WriteLine("I give up...");
+                            throw;
+                        }
+                    }
+                    attempts--;
+                }
+                while (!session.Opened);
+
+                Console.WriteLine("Connected.");
+
+                try
+                {
+                    Console.WriteLine($"Looking at: {directory}");
+                    RemoteDirectoryInfo directoryinfo = session.ListDirectory(directory);
+
+                    int filecount = directoryinfo.Files.Count();
+
+                    Console.WriteLine($"There are {filecount} files in the directory.");
+
+                    foreach (RemoteFileInfo fileInfo in directoryinfo.Files)
+                    {
+                        if (fileInfo.IsDirectory == false)
+                        {
+                            //Console.WriteLine($"{fileInfo.Name} with size {fileInfo.Length}, permissions {fileInfo.FilePermissions} and last modification at {fileInfo.LastWriteTime}");
+                            Console.WriteLine($"{fileInfo.Name}|{fileInfo.LastWriteTime}");
+                        }
+                        
                     }
                 }
-
-
-
-
-
-
-
-            }
-
-            // write resouce file.
-            using (StreamWriter resoucewriter = new StreamWriter(e1analyticsinternalfilelist))
-            {
-                //https://docs.microsoft.com/en-us/dotnet/api/system.resources.resourcewriter?view=net-5.0
-                
-                // use all files from ftp. to update and remove no longer listed file and add new ones. 
-
-                
-                //IResourceWriter writer = new IResourceWriter()
-                
-                //foreach (var filename in e1analyticssavedfileinfo)
-                //{
-                    
-                //}
-            }
-
-
-
-            // download and decrypt option. 
-            //  list out all files on console. enable user to input space delimited ints that are used to choose needed files. 
-
-
-
-            // debugger
-            //Console.ReadKey();
-        }
-
-        private static void WriteFileListToConsole(Session session, string directory) 
-        {
-            try
-            {
-                Console.WriteLine($"Looking at: {directory}");
-                RemoteDirectoryInfo directoryinfo = session.ListDirectory(directory);
-
-                int filecount = directoryinfo.Files.Count();
-
-                Console.WriteLine($"There are {filecount} files in the directory.");
-
-                foreach (RemoteFileInfo fileInfo in directoryinfo.Files)
+                catch (WinSCP.SessionException error)
                 {
-                    //Console.WriteLine($"{fileInfo.Name} with size {fileInfo.Length}, permissions {fileInfo.FilePermissions} and last modification at {fileInfo.LastWriteTime}");
-                    Console.WriteLine($"{fileInfo.Name} - {fileInfo.LastWriteTime}");
+                    Console.WriteLine($"SessionExceptionError: {error}");
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+            }
 
-            }
-            catch (WinSCP.SessionException error)
-            {
-                Console.WriteLine($"SessionExceptionError: {error}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            Console.ReadKey();
         }
 
-        private static List<string> SelectFilesToDownload(Dictionary<string, DateTime> ftpfileinfo)
+        private static List<string> SelectFilesToDownload(Dictionary<string, DateTime> newfilestodownload)
         {
             int filenumber = 1;
             List<string> filelist = new List<string>();
@@ -223,7 +223,7 @@ namespace FileProcessor
 
             Console.WriteLine("Select Files to download: ");
 
-            foreach (var file in ftpfileinfo.Keys)
+            foreach (var file in newfilestodownload.Keys)
             {
                 Console.WriteLine($"{filenumber}. {Path.GetFileName(file)}");
                 filelist.Add(file);
@@ -261,7 +261,46 @@ namespace FileProcessor
             }
         }
 
+        private static Dictionary<string, DateTime> ResourceFileReader(string resourcefilepath)
+        {
+            Dictionary<string, DateTime> storedfilelistresource = new Dictionary<string, DateTime>();
 
+            using (StreamReader reader = new StreamReader(resourcefilepath))
+            {
+                string line;
+                while((line = reader.ReadLine()) != null)
+                {
+                    string[] linesplit = line.Split(splitchar);
 
+                    try
+                    {
+                        DateTime filedate = DateTime.Parse(linesplit[1]);
+
+                        storedfilelistresource.Add(linesplit[0], filedate);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Failed to parse: {linesplit}");
+                        Console.WriteLine(e);
+                    }
+                }
+            }
+            // return dict of filename | lastwritetime
+            return storedfilelistresource;
+        }
+
+        private static void ResourceFileWriter(Dictionary<string, DateTime> datainput, string resourcefilepath)
+        {
+            Console.WriteLine($"Updating filelist resouce file: {resourcefilepath}");
+            using (StreamWriter writer = new StreamWriter(resourcefilepath))
+            {
+                foreach(var fileinfo in datainput.Keys)
+                {
+                    writer.WriteLine(string.Format($"{fileinfo}{splitchar}{datainput[fileinfo].ToString()}"));
+                }
+            }
+
+            Console.WriteLine("Update complted...");
+        }
     }
 }

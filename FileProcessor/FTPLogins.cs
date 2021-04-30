@@ -12,6 +12,43 @@ namespace FileProcessor
     public class FTPLogins
     {
 
+        public static Session LoginToOnboarding()
+        {
+            //login to onboarding
+            using (Session session = new Session())
+            {
+                // Connect
+                int attempts = 3;
+
+
+
+                do
+                {
+                    try
+                    {
+                        Console.WriteLine("Connecting to onboarding...");
+                        session.Open(FTPLogins.Onboarding());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write($"Failed to connect - {e}");
+                        if (attempts == 0)
+                        {
+                            // give up
+                            Console.WriteLine("I give up...");
+                            throw;
+                        }
+                    }
+                    attempts--;
+                }
+                while (!session.Opened);
+
+                Console.WriteLine("Connected.");
+
+                return session;
+            }
+        }
+
         public static SessionOptions Onboarding()
         {
             SessionOptions sessionsettings = new SessionOptions();

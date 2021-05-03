@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 using System.IO;
 using WinSCP;
 using System.Diagnostics;
-using System.Reflection;
-using System.Resources;
-using System.Configuration;
 
 
 namespace FileProcessor
@@ -18,8 +15,13 @@ namespace FileProcessor
         private const char splitchar = '|';
         private const string newlinesplit = "\r\n";
 
-        public static void AutoOnBoardingFTPSweeper()
+        public static void OnBoardingFTPSweeper()
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Executing Onboarding File Sweep...");
+            Console.WriteLine();
+            Console.ResetColor();
+            
             // e1analytics saved fileinfo dictionary.
             Dictionary<string, DateTime> e1analyticssavedfileinfo = new Dictionary<string, DateTime>();
 
@@ -30,8 +32,8 @@ namespace FileProcessor
             Dictionary<string, DateTime> newfilestodownload = new Dictionary<string, DateTime>();
 
             //e1sas01
-            //string e1sas = @"\\e1sas01\O\Client Files";
-            string ddrive = @"D:\";
+            //string savelocation = @"\\e1sas01\O\Client Files"; // cant' use to do download time taking WAY to long. connection gets terminated.
+            string savelocation = @"D:\";
 
             // new files found
             int newfilecount = 0;
@@ -65,16 +67,22 @@ namespace FileProcessor
                     {
                         Console.WriteLine("Connecting to onboarding...");
                         session.Open(FTPLogins.Onboarding());
+
+                        //additional settings.
+                        //session.AddRawConfiguration("Compression", "1"); // causes error to be thrown.
+                        session.SessionLogPath = Directory.GetCurrentDirectory() + @"\sessionlog.txt";
                     }
                     catch (Exception e)
                     {
-                        Console.Write($"Failed to connect - {e}");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Failed to connect - {e}");
                         if (attempts == 0)
                         {
                             // give up
                             Console.WriteLine("I give up...");
                             throw;
                         }
+                        Console.ResetColor();
                     }
                     attempts--;
                 }
@@ -113,14 +121,16 @@ namespace FileProcessor
                                 newfilestodownload.Add(fileinfo.FullName, fileinfo.LastWriteTime);
                                 newfilecount++;
                             }
-
                             filecount++;
                         }
                     }
-
-                    Console.WriteLine($"There are {filecount} files in the directory.");
-
-                    Console.WriteLine($"{newfilecount} - new files found in {ftpdirectory}");
+                    
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"There are {filecount} file(s) in the {ftpdirectory} directory.");
+                    Console.WriteLine($"{newfilecount} - new files found.");
+                    Console.WriteLine();
+                    Console.ResetColor();
                 }
                 catch (WinSCP.SessionException error)
                 {
@@ -131,28 +141,36 @@ namespace FileProcessor
                     Console.WriteLine(e.ToString());
                 }
 
-                // get file paths that are to be downloaded.
-                List<string> filestodownload = SelectFilesToDownload(newfilestodownload);
-
-                // foreach file download and decrypt to the O drive. 
-                foreach (var filepath in filestodownload)
+                if (newfilestodownload.Count() > 0)
                 {
-                    // foreach full file name, download and decrypt to target directory.
-                    Decryption.SweeperFileDownloadAndDecryptConsole(session, filepath, ddrive);
+                    // get file paths that are to be downloaded.
+                    List<string> filestodownload = SelectFilesToDownload(newfilestodownload);
+
+                    // foreach file download and decrypt to the O drive. 
+                    foreach (var filepath in filestodownload)
+                    {
+                        // foreach full file name, download and decrypt to target directory.
+                        Decryption.SweeperFileDownloadAndDecryptConsole(session, filepath, savelocation);
+                    }
+
+                    // update resouce file.
+                    ResourceFileWriter(e1analyticsftpfileinfo, resourcefile);
+
+                    Console.WriteLine("Download(s) completed and resource file updated with latest file list...");
                 }
-
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine();
+                    Console.WriteLine("No new files to download. Will now exit.");
+                    Console.ResetColor();
+                }
             }
-
-            // update resouce file.
-            ResourceFileWriter(e1analyticssavedfileinfo, resourcefile);
-
-            
-
-            
-
         }
 
-        public static void OnboardingFTPWriteFileListToConsole()
+
+        // additional methods
+        public static void OnboardingFTPWriteFileListToConsole() // for testing.
         {
             using (Session session = new Session())
             {
@@ -217,11 +235,12 @@ namespace FileProcessor
 
         private static List<string> SelectFilesToDownload(Dictionary<string, DateTime> newfilestodownload)
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             int filenumber = 1;
             List<string> filelist = new List<string>();
             List<string> filestodownload = new List<string>();
 
-            Console.WriteLine("Select Files to download: ");
+            Console.WriteLine("Files to download: ");
 
             foreach (var file in newfilestodownload.Keys)
             {
@@ -232,6 +251,7 @@ namespace FileProcessor
 
             // ALL
             Console.WriteLine("all. Download all files");
+            Console.ResetColor();
 
             Console.WriteLine();
             Console.Write("Select files with space delimited integers: ");
@@ -291,6 +311,7 @@ namespace FileProcessor
 
         private static void ResourceFileWriter(Dictionary<string, DateTime> datainput, string resourcefilepath)
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Updating filelist resouce file: {resourcefilepath}");
             using (StreamWriter writer = new StreamWriter(resourcefilepath))
             {
@@ -301,6 +322,8 @@ namespace FileProcessor
             }
 
             Console.WriteLine("Update complted...");
+            Console.ResetColor();
+            Console.WriteLine();
         }
     }
 }

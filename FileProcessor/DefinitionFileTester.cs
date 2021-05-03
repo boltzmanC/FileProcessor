@@ -25,7 +25,7 @@ namespace FileProcessor
                 {
                     try
                     {
-                        Console.WriteLine("Connecting to download.targus.info...");
+                        Console.WriteLine("Connecting to download.targusinfo.com:");
                         session.Open(FTPLogins.E1Platform());
                     }
                     catch (Exception e)
@@ -55,7 +55,7 @@ namespace FileProcessor
 
 
         // tools
-        public static string E1PlatformSelectDefinitionFile()
+        private static string E1PlatformSelectDefinitionFile()
         {
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -140,7 +140,7 @@ namespace FileProcessor
             return definitionfilepath;
         }
 
-        public static string DownloadAndTestDefinitionFile(Session session, string definitionfilepath)
+        private static string DownloadAndTestDefinitionFile(Session session, string definitionfilepath)
         {
             //download definition file.
             string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
@@ -351,7 +351,7 @@ namespace FileProcessor
         }
 
         // test files
-        public static void GenerateTestFile(string inputfile)
+        private static void GenerateTestFile(string inputfile)
         {
             Console.Write("Generate Test File (y/n)?: ");
             string generatefileinput = Console.ReadLine().ToLower().Trim();
@@ -363,7 +363,7 @@ namespace FileProcessor
             
         }
 
-        public static void GetSubsetOfRecords(string filepath)  //get subset of file.
+        private static void GetSubsetOfRecords(string filepath)  //get subset of file.
         {
             //default # of records to read. in the future can make this based on file length. 
             int numbertoread = 10000;

@@ -21,7 +21,7 @@ namespace FileProcessor
             //ProcessorStartMenu();
 
             //sweeper
-            Sweeper.AutoOnBoardingFTPSweeper();
+            Sweeper.OnBoardingFTPSweeper();
             //Sweeper.OnboardingFTPWriteFileListToConsole();
         }
 
@@ -42,7 +42,9 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "3. ", "Test file format against definition file.");
                 Console.WriteLine("{0,5}{1,-10}", "4. ", "Generate new .definition file.");
                 Console.WriteLine("{0,5}{1,-10}", "5. ", "Get subset of records");
-                //Console.WriteLine("{0,5}{1,-10}", "6. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "6. ", "Onboarding Sweeper.");
+                //Console.WriteLine("{0,5}{1,-10}", "7. ", "");
+                //Console.WriteLine("{0,5}{1,-10}", "8. ", "");
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();
                 Console.ResetColor();
@@ -71,6 +73,10 @@ namespace FileProcessor
 
                     case "5":
                         DefinitionFileTester.GetSubsetOfRecordsStandAlone();
+                        break;
+
+                    case "6":
+                        Sweeper.OnBoardingFTPSweeper();
                         break;
 
 

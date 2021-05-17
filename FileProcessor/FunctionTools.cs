@@ -222,13 +222,29 @@ namespace FileProcessor
             }
         }
 
-        
+        //introduction
+        public static void Introduction()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("File Processor for E1Monthly Files by Dylan White");
+            Console.WriteLine();
+            Console.ResetColor();
+        }
+
+        //console size.
+        public static void ConsoleSize()
+        {
+            //setconsole size
+            Console.SetWindowSize(150, 45);
+            int bufferwidth = Console.BufferWidth;
+            int bufferheight = 600;
+            Console.SetBufferSize(bufferwidth, bufferheight);
+        }
 
         // exit
         public static void ExitApp()
         {
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            //Console.ReadKey();
             Environment.Exit(0);
         }
     }

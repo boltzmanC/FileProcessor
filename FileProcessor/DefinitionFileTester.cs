@@ -25,11 +25,15 @@ namespace FileProcessor
                 {
                     try
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("Connecting to download.targusinfo.com:");
                         session.Open(FTPLogins.E1Platform());
+                        Console.WriteLine("Connected.");
+                        Console.ResetColor();
                     }
                     catch (Exception e)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write($"Failed to connect - {e}");
                         if (attempts == 0)
                         {
@@ -37,12 +41,11 @@ namespace FileProcessor
                             Console.WriteLine("I give up...");
                             throw;
                         }
+                        Console.ResetColor();
                     }
                     attempts--;
                 }
                 while (!session.Opened);
-
-                Console.WriteLine("Connected.");
 
                 //test target file and definition file. 
                 string inputfile = DownloadAndTestDefinitionFile(session, definitionfilepath);
@@ -290,21 +293,7 @@ namespace FileProcessor
                             }
                         }
 
-                        using (StreamWriter newdefinitionfile = new StreamWriter(newdefinitionfilepath))
-                        {
-                            foreach (var value in fileinfo)
-                            {
-                                newdefinitionfile.WriteLine(value);
-                            }
-
-                            int columnnumber = 1;
-                            foreach (var column in headersplit)
-                            {
-                                string linebuilder = "column" + columnnumber + ".fieldname = ";
-                                newdefinitionfile.WriteLine(linebuilder + column);
-                                columnnumber += 1;
-                            }
-                        }
+                        WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
                     }
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
@@ -319,31 +308,8 @@ namespace FileProcessor
 
                     if (yesno.ToUpper() == "y".ToUpper())
                     {
-                        using (StreamWriter newdefinitionfile = new StreamWriter(newdefinitionfilepath))
-                        {
-                            newdefinitionfile.WriteLine("Target file column List");
-                            newdefinitionfile.WriteLine();
-                            newdefinitionfile.WriteLine();
-                            newdefinitionfile.WriteLine();
-
-                            foreach (var value in fileinfo)
-                            {
-                                newdefinitionfile.WriteLine(value);
-                            }
-
-                            int columnnumber = 1;
-                            foreach (var column in headersplit)
-                            {
-                                string linebuilder = "column" + columnnumber + ".fieldname = ";
-                                newdefinitionfile.WriteLine(linebuilder + column);
-                                columnnumber += 1;
-                            }
-                        }
+                        WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
                     }
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
-                    Console.ResetColor();
-                    Console.WriteLine();
                 }
             }
 
@@ -360,7 +326,6 @@ namespace FileProcessor
             {
                 GetSubsetOfRecords(inputfile);
             }
-            
         }
 
         private static void GetSubsetOfRecords(string filepath)  //get subset of file.
@@ -574,5 +539,47 @@ namespace FileProcessor
 
         }
 
+        private static void WriteNewDefinitionFile(string definitionfilepath, List<string> fileinformation, string[] fileheader)
+        {
+            using (StreamWriter newdefinitionfile = new StreamWriter(definitionfilepath))
+            {
+                foreach (var value in fileinformation)
+                {
+                    newdefinitionfile.WriteLine(value);
+                }
+
+                int columnnumber = 1;
+                foreach (var column in fileheader)
+                {
+                    string linebuilder = "column" + columnnumber + ".fieldname = ";
+                    newdefinitionfile.WriteLine(linebuilder + column);
+                    columnnumber += 1;
+                }
+            }
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"New Definition file created: {definitionfilepath}");
+            Console.ResetColor();
+            Console.WriteLine();
+
+            //using (StreamWriter newdefinitionfile = new StreamWriter(newdefinitionfilepath))
+            //{
+            //    foreach (var value in fileinfo)
+            //    {
+            //        newdefinitionfile.WriteLine(value);
+            //    }
+
+            //    int columnnumber = 1;
+            //    foreach (var column in headersplit)
+            //    {
+            //        string linebuilder = "column" + columnnumber + ".fieldname = ";
+            //        newdefinitionfile.WriteLine(linebuilder + column);
+            //        columnnumber += 1;
+            //    }
+            //}
+            //Console.ForegroundColor = ConsoleColor.Cyan;
+            //Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
+            //Console.ResetColor();
+            //Console.WriteLine();
+        }
     }
 }

@@ -11,17 +11,15 @@ namespace FileProcessor
     {
         public static void Main(string[] args)
         {
-            //setconsole size
-            Console.SetWindowSize(150, 45);
-            int bufferwidth = Console.BufferWidth;
-            int bufferheight = 600;
-            Console.SetBufferSize(bufferwidth, bufferheight);
+            FunctionTools.Introduction();
+            FunctionTools.ConsoleSize();
+
 
             //GO
-            //ProcessorStartMenu();
+            ProcessorStartMenu();
 
             //sweeper
-            Sweeper.OnBoardingFTPSweeper();
+            //Sweeper.OnBoardingFTPSweeper();
             //Sweeper.OnboardingFTPWriteFileListToConsole();
         }
 
@@ -95,4 +93,5 @@ namespace FileProcessor
             }
         }
     }
+
 }

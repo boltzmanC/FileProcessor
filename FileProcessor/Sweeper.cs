@@ -13,7 +13,7 @@ namespace FileProcessor
     public class Sweeper
     {
         private const char splitchar = '|';
-        private const string newlinesplit = "\r\n";
+        //private const string newlinesplit = "\r\n";
 
         public static void OnBoardingFTPSweeper()
         {
@@ -146,6 +146,11 @@ namespace FileProcessor
                     // get file paths that are to be downloaded.
                     List<string> filestodownload = SelectFilesToDownload(newfilestodownload);
 
+                    if (filestodownload.Count == 0) // if the list is empty then start over. 
+                    {
+                        Processor.ProcessorStartMenu();
+                    }
+
                     // foreach file download and decrypt to the O drive. 
                     foreach (var filepath in filestodownload)
                     {
@@ -162,8 +167,9 @@ namespace FileProcessor
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine();
-                    Console.WriteLine("No new files to download. Will now exit.");
+                    Console.WriteLine("No new files to download.");
                     Console.ResetColor();
+                    Processor.ProcessorStartMenu();
                 }
             }
         }
@@ -261,7 +267,11 @@ namespace FileProcessor
             {
                 case "all":
                     return filelist;
-                
+
+                case "cancel": //return emtpty list and return to top level menu
+                    List<string> emptylist = new List<string>();
+                    return emptylist;
+
                 default:
                     // parse out the numbers and grab the specified file names.
                     foreach (var i in input.Split(' '))

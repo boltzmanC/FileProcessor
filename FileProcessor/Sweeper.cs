@@ -31,9 +31,13 @@ namespace FileProcessor
             // new files to download
             Dictionary<string, DateTime> newfilestodownload = new Dictionary<string, DateTime>();
 
-            //e1sas01
-            //string savelocation = @"\\e1sas01\O\Client Files"; // cant' use to do download time taking WAY to long. connection gets terminated.
-            string savelocation = @"D:\";
+            // Save Location
+            string savelocation = SaveLocation();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine();
+            Console.WriteLine($"Save Location set to: {savelocation}");
+            Console.WriteLine();
+            Console.ResetColor();
 
             // new files found
             int newfilecount = 0;
@@ -65,9 +69,12 @@ namespace FileProcessor
                 {
                     try
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("Connecting to onboarding...");
-                        session.Open(FTPLogins.Onboarding());
+                        Console.ResetColor();
 
+                        session.Open(FTPLogins.Onboarding());
+                        
                         //additional settings.
                         //session.AddRawConfiguration("Compression", "1"); // causes error to be thrown.
                         session.SessionLogPath = Directory.GetCurrentDirectory() + @"\sessionlog.txt";
@@ -237,6 +244,35 @@ namespace FileProcessor
             }
 
             Console.ReadKey();
+        }
+
+        private static string SaveLocation()
+        {
+            string directorylookup = @"\\e1sas01\O\Client Files\OnboardingSweepResults";
+            string savelocation = @"D:\";
+
+            Console.WriteLine("Save to e1sas01 (y/n)?: ");
+            string input = Console.ReadLine().Trim().ToLower();
+
+            if (input == "y")
+            {
+                if (!Directory.Exists(directorylookup))
+                {
+                    Directory.CreateDirectory(directorylookup);
+                    savelocation = directorylookup;
+                    return savelocation;
+                }
+                else
+                {
+                    savelocation = directorylookup;
+                    return savelocation;
+                }
+            }
+            else
+            {
+                return savelocation;
+            }
+
         }
 
         private static List<string> SelectFilesToDownload(Dictionary<string, DateTime> newfilestodownload)

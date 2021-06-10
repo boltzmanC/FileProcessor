@@ -274,7 +274,7 @@ namespace FileProcessor
 
                 if (matched == false) //same number of columns but different order or +/- column.
                 {
-                    Console.Write("Generating new .definition from file headers? (y/n): ");
+                    Console.Write("Generate new .definition from file headers? (y/n): ");
                     string yesno = Console.ReadLine().ToUpper();
 
                     if (yesno.ToUpper() == "y".ToUpper())
@@ -294,21 +294,28 @@ namespace FileProcessor
                         }
 
                         WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
+
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
+                        Console.ResetColor();
+                        Console.WriteLine();
                     }
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
-                    Console.ResetColor();
-                    Console.WriteLine();
+                    
                 }
 
                 if (morecolumns == true || lesscolumns == true)
                 {
-                    Console.Write("Generating new .definition with new file header? (y/n): ");
+                    Console.Write("Generate new .definition with new file header? (y/n): ");
                     string yesno = Console.ReadLine().ToUpper();
 
                     if (yesno.ToUpper() == "y".ToUpper())
                     {
                         WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
+
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
+                        Console.ResetColor();
+                        Console.WriteLine();
                     }
                 }
             }

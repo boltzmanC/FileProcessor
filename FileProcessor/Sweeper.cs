@@ -15,6 +15,10 @@ namespace FileProcessor
         private const char splitchar = '|';
         //private const string newlinesplit = "\r\n";
 
+
+        //todo
+        // change so that files are downloaded then dycrpted. no need to decrypt between downloads. this causes connection to sftp site to drop 
+
         public static void OnBoardingFTPSweeper()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -69,10 +73,6 @@ namespace FileProcessor
                 {
                     try
                     {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Connecting to onboarding...");
-                        Console.ResetColor();
-
                         session.Open(FTPLogins.Onboarding());
                         
                         //additional settings.
@@ -162,7 +162,7 @@ namespace FileProcessor
                     foreach (var filepath in filestodownload)
                     {
                         // foreach full file name, download and decrypt to target directory.
-                        Decryption.SweeperFileDownloadAndDecryptConsole(session, filepath, savelocation);
+                        Decryption.SweeperFileDownloadAndDecryptConsole(session, filepath, @savelocation);
                     }
 
                     // update resouce file.
@@ -248,10 +248,10 @@ namespace FileProcessor
 
         private static string SaveLocation()
         {
-            string directorylookup = @"\\e1sas01\O\Client Files\OnboardingSweepResults";
+            string directorylookup = @"\\e1sas01\O\OnboardingSweepResults";
             string savelocation = @"D:\";
 
-            Console.WriteLine("Save to e1sas01 (y/n)?: ");
+            Console.Write("Save to e1sas01 (y/n)?: ");
             string input = Console.ReadLine().Trim().ToLower();
 
             if (input == "y")
@@ -355,7 +355,7 @@ namespace FileProcessor
             return storedfilelistresource;
         }
 
-        private static void ResourceFileWriter(Dictionary<string, DateTime> datainput, string resourcefilepath)
+        private static void ResourceFileWriter(Dictionary<string, DateTime> datainput, string resourcefilepath) // todo add notification of file first time this process is run and its save location.
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Updating filelist resouce file: {resourcefilepath}");

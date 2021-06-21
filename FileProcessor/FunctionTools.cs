@@ -24,7 +24,7 @@ namespace FileProcessor
             return path;
         }
 
-        static public string GetAFileOrDirectory()
+        public static string GetAFileOrDirectory()
         {
             Console.Write("Enter directory or file path: ");
 
@@ -35,7 +35,7 @@ namespace FileProcessor
             return path;
         }
 
-        static public char GetDelimiter()
+        public static char GetDelimiter()
         {
             Console.Write("Enter Delimeter: ");
             var delimeter = Console.ReadLine();
@@ -51,7 +51,7 @@ namespace FileProcessor
             return splitchar;
         }
 
-        static public char GetTXTQualifier()
+        public static char GetTXTQualifier()
         {
             Console.Write("Enter Txt Qualifier: ");
             var delimeter = Console.ReadLine();
@@ -86,7 +86,25 @@ namespace FileProcessor
             }
         }
 
-        static public string[] SplitLineWithTxtQualifier(string expression, char delimiter, char qualifier, bool ignoreCase) //true -> sets everything to lower.
+        public static string GetUser()
+        {
+            Console.WriteLine();
+            Console.Write("Enter username: ");
+            string user = Console.ReadLine().Trim().ToLower();
+
+            return user;
+        }
+
+        public static string GetPasscode()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Enter passcode: ");
+            string passcode = Console.ReadLine().Trim();
+
+            return passcode;
+        }
+
+        public static string[] SplitLineWithTxtQualifier(string expression, char delimiter, char qualifier, bool ignoreCase) //true -> sets everything to lower.
         {
             if (ignoreCase)
             {
@@ -158,19 +176,19 @@ namespace FileProcessor
             return list.ToArray();
         }
 
-        static public string GetDesktopDirectory()
+        public static string GetDesktopDirectory()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         }
 
-        static public string GetFileNameWithoutExtension(string targetfile)
+        public static string GetFileNameWithoutExtension(string targetfile)
         {
             string filename = Path.GetFileNameWithoutExtension(targetfile);
 
             return filename;
         }
 
-        static public string GetParentFolder(string targetfile)
+        public static string GetParentFolder(string targetfile)
         {
             string parentfolder = Directory.GetParent(targetfile).ToString();
             return parentfolder;

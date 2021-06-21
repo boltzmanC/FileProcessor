@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using WinSCP;
+using System.IO;
 
 
 namespace FileProcessor
@@ -52,21 +53,31 @@ namespace FileProcessor
         public static SessionOptions Onboarding()
         {
             SessionOptions sessionsettings = new SessionOptions();
+            
+            string username = FunctionTools.GetUser();
+            string passcode = string.Empty;
+
+            if (username != "dwhite")
+            {
+                passcode = FunctionTools.GetPasscode();
+            }
+            else
+            {
+                StreamReader passcodefile = new StreamReader(@"C:\Users\dwhite\Desktop\Notes\fileprocessorcredentials.txt");
+
+                passcode = passcodefile.ReadLine().Trim();
+            }
+
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Connecting to onboarding...");
+            Console.ResetColor();
 
             // copied from winscp.
-            //SessionOptions sessionsettings = new SessionOptions
-            //{
-            //    Protocol = Protocol.Sftp,
-            //    HostName = "onboarding.neustar.biz",
-            //    UserName = "dwhite",
-            //    Password = "1972Nova12345",
-            //    SshHostKeyFingerprint = "ssh-rsa 1024 MKA9n3CYF8dY+j9P713bUoWelyJtFdv8gNpfn8pkzoc=",
-            //};
-
             sessionsettings.Protocol = Protocol.Sftp;
             sessionsettings.HostName = "onboarding.neustar.biz";
-            sessionsettings.UserName = "dwhite";
-            sessionsettings.Password = "1972Nova12345";
+            sessionsettings.UserName = username;
+            sessionsettings.Password = passcode;
             sessionsettings.SshHostKeyFingerprint = "ssh-rsa 1024 MKA9n3CYF8dY+j9P713bUoWelyJtFdv8gNpfn8pkzoc=";
 
             return sessionsettings;

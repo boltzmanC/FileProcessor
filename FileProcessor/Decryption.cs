@@ -133,23 +133,32 @@ namespace FileProcessor
         public static void SweeperFileDownloadAndDecryptConsole(Session session, string ftpfilepath, string targetdirectory)
         {
             // this uses the existing JAVA decryption method. Having these files is a prerequisite to running this program.
-            Console.WriteLine();
-            Console.WriteLine($"Downloading: {ftpfilepath}");
-            
-
-            // download file and store on target drive / directory.
-            session.GetFileToDirectory(ftpfilepath, targetdirectory, false); //https://winscp.net/eng/docs/library_session_getfiletodirectory
-
-            Console.WriteLine("Download complete...");
 
             // filepath of saved file.
             string newfilepath = targetdirectory + @"\" + Path.GetFileName(ftpfilepath);
             string decryptedfilepath = Directory.GetParent(newfilepath) + @"\" + FunctionTools.GetFileNameWithoutExtension(newfilepath);
 
+            if (!File.Exists(decryptedfilepath))
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Downloading: {ftpfilepath}");
+
+
+                // download file and store on target drive / directory.
+                session.GetFileToDirectory(ftpfilepath, targetdirectory, false); //https://winscp.net/eng/docs/library_session_getfiletodirectory
+
+                Console.WriteLine("Download complete...");
+            }
+            else
+            {
+                Console.WriteLine();
+                Console.WriteLine($"file exists, starting decryption - {newfilepath} ");
+            }
+
             // run command line commands
             string targusdirectorycheck = @"C:\targus\tds\pgp";
 
-            if (Directory.Exists(targusdirectorycheck))
+            if (Directory.Exists(targusdirectorycheck) && !File.Exists(decryptedfilepath))
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 string executedecryption = String.Format($@"C:\targus\tds\pgp\e1pgp.bat decrypt tdssys {newfilepath} {decryptedfilepath}");

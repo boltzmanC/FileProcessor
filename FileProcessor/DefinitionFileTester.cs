@@ -63,7 +63,9 @@ namespace FileProcessor
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("Select definition file to test against on the e1platform FTP: ");
-            
+
+            // todo. make new constant class that will store the client files. makes more usable and readable. easy to add new files. 
+            //List<string> defaultvalues = typeof(BingoValuesDefault).GetAllPublicConstantValues<string>();
 
             //Console.WriteLine();
             //Console.WriteLine("Select definition file:");

@@ -53,8 +53,7 @@ namespace FileProcessor
                 switch (input)
                 {
                     case "1":
-                        //System.Diagnostics.Process.Start("insert webpage url here");
-                        Console.WriteLine("Not implemented yet.");
+                        System.Diagnostics.Process.Start("https://confluence.nexgen.neustar.biz/display/E1/FileProcessor+Program+Documentation");
                         break;
 
                     case "2":

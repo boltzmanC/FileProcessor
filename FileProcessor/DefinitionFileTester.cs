@@ -14,7 +14,9 @@ namespace FileProcessor
         public static void E1PlatformFileTester()
         {
             //select definition file
-            string definitionfilepath = E1PlatformSelectDefinitionFile();
+            //string definitionfilepath = E1PlatformSelectDefinitionFile();
+
+            string definitionfilepath = E1PlatformSelectDefinitionFilenew();
 
             //login to FTPClient
             using (Session session = new Session())
@@ -54,8 +56,6 @@ namespace FileProcessor
                 GenerateTestFile(inputfile);
             }
         }
-
-
 
         // tools
         private static string E1PlatformSelectDefinitionFile()
@@ -145,10 +145,64 @@ namespace FileProcessor
             return definitionfilepath;
         }
 
+        private static string E1PlatformSelectDefinitionFilenew()
+        {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Select definition file to test against on the e1platform FTP: ");
+
+            // get name + path for all definition files.
+            Dictionary<string, string> definitionfilelookup = FunctionTools.GetListofDefinitionFiles(typeof(DefinitionFileList).GetAllPublicConstantValues<string>());
+
+            int filecount = definitionfilelookup.Count();
+
+            for (int x = 0; x < filecount; x++)
+            {
+                Console.WriteLine("{0,5}{1,-10}", x + ". ", definitionfilelookup.ElementAt(x).Key);
+            }
+
+            Console.WriteLine("{0,5}{1,-10}", "exit: ", "exit");
+            Console.ResetColor();
+
+            Console.WriteLine();
+            Console.Write("Definition File: ");
+            string input = Console.ReadLine().ToUpper();
+
+            if (input.ToLower() == "exit") //handle exit option
+            {
+                Processor.ProcessorStartMenu();
+            }
+
+            string definitionfilepath = string.Empty;
+
+            int index;
+
+            // parse input
+            bool parsed = Int32.TryParse(input, out index);
+            if (parsed)
+            {
+                definitionfilepath = definitionfilelookup.ElementAt(index).Value;
+            }
+            else
+            {
+                Console.WriteLine("Invalid number entered, try again...");
+                E1PlatformFileTester(); //restart.
+            }
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine();
+            Console.WriteLine($"{definitionfilelookup.ElementAt(index).Key} - definition file selected");
+            Console.WriteLine();
+            Console.ResetColor();
+
+            return definitionfilepath;
+        }
+
         private static string DownloadAndTestDefinitionFile(Session session, string definitionfilepath)
         {
             //download definition file.
             string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
+
             session.GetFiles(definitionfilepath, tempdefinitionfile);
 
             List<string> fileinfo = new List<string>();
@@ -296,11 +350,6 @@ namespace FileProcessor
                         }
 
                         WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
-
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
-                        Console.ResetColor();
-                        Console.WriteLine();
                     }
                     
                 }
@@ -313,11 +362,6 @@ namespace FileProcessor
                     if (yesno.ToUpper() == "y".ToUpper())
                     {
                         WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
-
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"New Definition file created: {newdefinitionfilepath}");
-                        Console.ResetColor();
-                        Console.WriteLine();
                     }
                 }
             }

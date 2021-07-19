@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Decryption.cs" />
+    <Compile Include="DefinitionFileList.cs" />
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FTPLogins.cs" />
     <Compile Include="FunctionTools.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Sweeper.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

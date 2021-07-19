@@ -240,6 +240,25 @@ namespace FileProcessor
             }
         }
 
+        public static  Dictionary<string, string> GetListofDefinitionFiles (List<string> storeddefinitionfilepaths)
+        {
+            Dictionary<string, string> definitionfilelookup = new Dictionary<string, string>();
+
+            foreach (var fileinfo in storeddefinitionfilepaths)
+            {
+                // hard coded values for simplicity, correct way to do this would be to test all input and verify
+                string[] splitfileinfo = fileinfo.Split(',');
+
+                if (!definitionfilelookup.ContainsKey(splitfileinfo[0]))
+                {
+                    definitionfilelookup.Add(splitfileinfo[0].Trim(), splitfileinfo[1].Trim()); // trim to handle typo spaces.
+                }
+            }
+
+            return definitionfilelookup;
+        }
+
+
         //introduction
         public static void Introduction()
         {

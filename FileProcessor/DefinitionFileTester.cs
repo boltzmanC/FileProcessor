@@ -11,12 +11,15 @@ namespace FileProcessor
 {
     public class DefinitionFileTester
     {
+        private const string lorealstring = "Loreal";
+        private const string allstring = "ALL";
+
         public static void E1PlatformFileTester()
         {
             //select definition file
             //string definitionfilepath = E1PlatformSelectDefinitionFile();
 
-            string definitionfilepath = E1PlatformSelectDefinitionFilenew();
+            List<string> definitionfilepaths = E1PlatformSelectDefinitionFilenew();
 
             //login to FTPClient
             using (Session session = new Session())
@@ -49,11 +52,14 @@ namespace FileProcessor
                 }
                 while (!session.Opened);
 
-                //test target file and definition file. 
-                string inputfile = DownloadAndTestDefinitionFile(session, definitionfilepath);
+                foreach (var path in definitionfilepaths)
+                {
+                    //test target file and definition file. 
+                    string inputfile = DownloadAndTestDefinitionFile(session, path);
 
-                //Generate test file
-                GenerateTestFile(inputfile);
+                    //Generate test file
+                    GenerateTestFile(inputfile);
+                }
             }
         }
 
@@ -145,14 +151,49 @@ namespace FileProcessor
             return definitionfilepath;
         }
 
-        private static string E1PlatformSelectDefinitionFilenew()
+        private static List<string> E1PlatformSelectDefinitionFilenew()
+        {
+            // get name + path for all definition files.
+            Dictionary<string, string> definitionfilelookup = FunctionTools.GetListofDefinitionFiles(typeof(DefinitionFileList).GetAllPublicConstantValues<string>());
+
+            // definition file path main menu. returns single file path, except when LOREAL option is chosen.
+            string definitionfilepath = DefinitionFileListMainMenu(definitionfilelookup);
+
+            List<string> templist = new List<string>();
+
+            if (definitionfilepath == lorealstring)
+            {
+                Dictionary<string, string> lorealdefinitionfilelookup = FunctionTools.GetListofDefinitionFiles(typeof(LorealDefinitionFileList).GetAllPublicConstantValues<string>());
+
+                string lorealdefinitionfilepath = DefinitionFileListLorealMenu(lorealdefinitionfilelookup);
+
+                if (lorealdefinitionfilepath == allstring)
+                {
+                    foreach (var kvp in lorealdefinitionfilelookup)
+                    {
+                        templist.Add(kvp.Value);
+                    }
+
+                    return templist;
+                }
+                else
+                {
+                    templist.Add(lorealdefinitionfilepath);
+                    return templist;
+                }
+            }
+            else
+            {
+                templist.Add(definitionfilepath);
+                return templist;
+            }
+        }
+
+        private static string DefinitionFileListMainMenu(Dictionary<string, string> definitionfilelookup)
         {
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("Select definition file to test against on the e1platform FTP: ");
-
-            // get name + path for all definition files.
-            Dictionary<string, string> definitionfilelookup = FunctionTools.GetListofDefinitionFiles(typeof(DefinitionFileList).GetAllPublicConstantValues<string>());
 
             int filecount = definitionfilelookup.Count();
 
@@ -160,6 +201,9 @@ namespace FileProcessor
             {
                 Console.WriteLine("{0,5}{1,-10}", x + ". ", definitionfilelookup.ElementAt(x).Key);
             }
+
+            //Loreal menu option.
+            Console.WriteLine("{0,5}{1,-10}", filecount + ". ", "Loreal Brand Files Menu"); //set to file count to maintain number sequence
 
             Console.WriteLine("{0,5}{1,-10}", "exit: ", "exit");
             Console.ResetColor();
@@ -179,9 +223,13 @@ namespace FileProcessor
 
             // parse input
             bool parsed = Int32.TryParse(input, out index);
-            if (parsed)
+            if (parsed && index < filecount)
             {
                 definitionfilepath = definitionfilelookup.ElementAt(index).Value;
+            }
+            else if (parsed && (index == filecount)) // loreal process breakout
+            {
+                return lorealstring;
             }
             else
             {
@@ -189,11 +237,57 @@ namespace FileProcessor
                 E1PlatformFileTester(); //restart.
             }
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            return definitionfilepath;
+        }
+
+        private static string DefinitionFileListLorealMenu(Dictionary<string, string> definitionfilelookup)
+        {
             Console.WriteLine();
-            Console.WriteLine($"{definitionfilelookup.ElementAt(index).Key} - definition file selected");
-            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Select definition file to test against on the e1platform FTP: ");
+
+            int filecount = definitionfilelookup.Count();
+
+            for (int x = 0; x < filecount; x++)
+            {
+                Console.WriteLine("{0,5}{1,-10}", x + ". ", definitionfilelookup.ElementAt(x).Key);
+            }
+
+            //Loreal menu option.
+            Console.WriteLine("{0,5}{1,-10}", filecount + ". ", allstring); //set to file count to maintain number sequence
+
+            Console.WriteLine("{0,5}{1,-10}", "exit: ", "exit");
             Console.ResetColor();
+
+            Console.WriteLine();
+            Console.Write("Definition File: ");
+            string input = Console.ReadLine().ToUpper();
+
+            if (input.ToLower() == "exit") //handle exit option
+            {
+                Processor.ProcessorStartMenu();
+            }
+
+            string definitionfilepath = string.Empty;
+
+            int index;
+
+            // parse input
+            bool parsed = Int32.TryParse(input, out index);
+            if (parsed && index < filecount)
+            {
+                definitionfilepath = definitionfilelookup.ElementAt(index).Value;
+            }
+            else if (parsed && (index == filecount))
+            {
+                return allstring;
+            }
+            else
+            {
+                Console.WriteLine("Invalid number entered, try again...");
+                E1PlatformFileTester(); //restart.
+            }
 
             return definitionfilepath;
         }
@@ -237,6 +331,14 @@ namespace FileProcessor
             {
                 File.Delete(@"tempdefintionfile.definition");
             }
+
+            //show current definition file being tested.
+            string definitionfilename = definitionfilepath.Split('/').Last();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine();
+            Console.WriteLine($"    {definitionfilename} - definition file selected");
+            Console.WriteLine();
+            Console.ResetColor();
 
             //Get file to test
             Console.WriteLine("File to Test:");
@@ -369,6 +471,7 @@ namespace FileProcessor
             return file;
         }
 
+        
         // test files
         private static void GenerateTestFile(string inputfile)
         {

@@ -57,6 +57,7 @@
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FTPLogins.cs" />
     <Compile Include="FunctionTools.cs" />
+    <Compile Include="LorealDefinitionFileList.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

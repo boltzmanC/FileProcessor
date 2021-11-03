@@ -13,7 +13,7 @@ namespace FileProcessor
     public class FunctionTools
     {
         // list of generic methods to be used throughout the app.
-        static public string GetAFile()
+        public static string GetAFile()
         {
             Console.Write("File:");
 
@@ -24,9 +24,9 @@ namespace FileProcessor
             return path;
         }
 
-        public static string GetAFileOrDirectory()
+        public static string GetADirectory()
         {
-            Console.Write("Enter directory or file path: ");
+            Console.Write("Enter directory: ");
 
             string path = Console.ReadLine().Replace("\"", "").Trim();
 
@@ -190,8 +190,7 @@ namespace FileProcessor
 
         public static string GetParentFolder(string targetfile)
         {
-            string parentfolder = Directory.GetParent(targetfile).ToString();
-            return parentfolder;
+            return Directory.GetParent(targetfile).ToString();
         }
 
         public static void DecompressFile(string targetfile)
@@ -256,6 +255,39 @@ namespace FileProcessor
             }
 
             return definitionfilelookup;
+        }
+
+        public static void LorealChangeFileNamestoReload(string targetdirectory)
+        {
+            //LOREAL_BIOL_20211012120215_HH.csv - file name
+
+            // get extension
+            // split on _
+            // take first two values from split
+            // append "reload"
+            // reappend extension
+
+            string reload = "_reload";
+            int firstvalue = 1;
+            int countofvalues = 2;
+
+            string[] filepaths = Directory.GetFiles(targetdirectory); 
+
+            foreach (string file in filepaths)
+            {
+                // take in new file name
+                // break file name up. 
+                
+                string extension = Path.GetExtension(file);
+                string filename = Path.GetFileNameWithoutExtension(file);
+
+                string[] splitfilename = filename.Split('_');
+
+                string newfilename = string.Join("_", splitfilename, firstvalue, countofvalues) + reload + extension;
+                    //https://www.geeksforgeeks.org/c-sharp-join-method-set-1/
+
+                File.Move(file, newfilename);
+            }
         }
 
 

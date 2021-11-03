@@ -14,9 +14,33 @@ namespace FileProcessor
         public static void DecryptFileStart()
         {
             string file = FunctionTools.GetAFile();
-            SameDirectoryFileDecryptConsole(file);
-        }
 
+            //detect file or directory.
+            bool directorytest = Directory.Exists(@file);
+            bool filetest = File.Exists(@file);
+
+            if (directorytest == true)
+            {
+                // read all files in directory, then loop through
+                string[] filepaths = Directory.GetFiles(@file);
+
+                foreach (string f in filepaths)
+                {
+                    SameDirectoryFileDecryptConsole(f);
+                }
+
+            }
+            else if (filetest == true)
+            {
+                // just decrypt the target. same as before.
+                SameDirectoryFileDecryptConsole(file);
+            }
+            else
+            {
+                Console.ResetColor();
+                Console.WriteLine($"Invalid entry: {file}");
+            }
+        }
 
         public static void SameDirectoryFileDecryptConsole(string filepath)
         {

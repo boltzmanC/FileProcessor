@@ -14,11 +14,14 @@ namespace FileProcessor
         private const string lorealstring = "Loreal";
         private const string allstring = "ALL";
 
+        //testing loreal
+        public static bool testingloreal = false;
+
+
         public static void E1PlatformFileTester()
         {
             //select definition file
             //string definitionfilepath = E1PlatformSelectDefinitionFile();
-
             List<string> definitionfilepaths = E1PlatformSelectDefinitionFilenew();
 
             //login to FTPClient
@@ -54,17 +57,31 @@ namespace FileProcessor
 
                 foreach (var path in definitionfilepaths)
                 {
-                    //test target file and definition file. 
-                    string inputfile = DownloadAndTestDefinitionFile(session, path);
 
-                    //Generate test file
-                    GenerateTestFile(inputfile);
+                    //if all loreal files are selected...
+                    if (testingloreal == true)
+                    {
+                        //test loreal files and genereate test files for all.
+                        LorealDownloadAndTestDefinitionFile(session, path);
+                        
+                        //reset value.
+                        testingloreal = false;
+                    }
+                    else
+                    {
+                        //test target file and definition file. 
+                        string inputfile = DownloadAndTestDefinitionFile(session, path);
+
+                        //Generate test file
+                        GenerateTestFile(inputfile);
+                    }
+
                 }
             }
         }
 
         // tools
-        private static string E1PlatformSelectDefinitionFile()
+        private static string E1PlatformSelectDefinitionFile() //not used
         {
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -173,6 +190,9 @@ namespace FileProcessor
                     {
                         templist.Add(kvp.Value);
                     }
+
+                    //we will be testing all loreal brand files
+                    testingloreal = true;
 
                     return templist;
                 }
@@ -320,12 +340,6 @@ namespace FileProcessor
                 }
             }
 
-            List<string> columnnamesupper = new List<string>();
-            foreach (var c in columnnames)
-            {
-                columnnamesupper.Add(c.ToUpper());
-            }
-
             //delete temp definition file.
             if (File.Exists(@"tempdefintionfile.definition"))
             {
@@ -347,6 +361,88 @@ namespace FileProcessor
             char txtq = FunctionTools.GetTXTQualifier();
 
             string newdefinitionfilepath = Directory.GetParent(file) + "\\" + "NEW_" + definitionfilepath.Split('/').Last();
+
+            DefinitionFileTestResults(file, delimiter, txtq, fileinfo, columnnames, newdefinitionfilepath);
+
+            return file;
+        }
+
+        private static void LorealDownloadAndTestDefinitionFile(Session session, string definitionfilepath)
+        {
+            //download definition file.
+            string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
+
+            session.GetFiles(definitionfilepath, tempdefinitionfile);
+
+            List<string> fileinfo = new List<string>();
+            List<string> columnnames = new List<string>();
+
+            using (StreamReader readdefinitionfile = new StreamReader(tempdefinitionfile))
+            {
+                string line = string.Empty;
+                while ((line = readdefinitionfile.ReadLine()) != null)
+                {
+                    if (line.Contains(".fieldname"))
+                    {
+                        string[] linevalues = line.Split('=');
+                        string columnname = linevalues.Last().Trim();
+                        columnnames.Add(columnname);
+                    }
+                    else
+                    {
+                        fileinfo.Add(line);
+                    }
+                }
+            }
+
+            //delete temp definition file.
+            if (File.Exists(@"tempdefintionfile.definition"))
+            {
+                File.Delete(@"tempdefintionfile.definition");
+            }
+
+            //show current definition file being tested.
+            string definitionfilename = definitionfilepath.Split('/').Last();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine();
+            Console.WriteLine($"    {definitionfilename} - definition file selected");
+            Console.WriteLine();
+            Console.ResetColor();
+
+            //get loreal home
+            Console.WriteLine();
+            Console.Write("Enter parent Direcotry of Loreal Files to test: ");
+
+            string lorealfilehome = FunctionTools.GetADirectory();
+            char delimiter = FunctionTools.GetDelimiter();
+            char txtq = FunctionTools.GetTXTQualifier();
+
+            //rename loreal files.
+            FunctionTools.LorealChangeFileNamestoReload(lorealfilehome);
+
+            //Get file to test
+            string[] filepaths = Directory.GetFiles(lorealfilehome);
+
+            foreach (var f in filepaths)
+            {
+                string newdefinitionfilepath = Directory.GetParent(f) + "\\" + "NEW_" + definitionfilepath.Split('/').Last();
+
+                DefinitionFileTestResults(f, delimiter, txtq, fileinfo, columnnames, newdefinitionfilepath);
+
+                //Generate test file
+                GetSubsetOfRecords(f);
+            }
+        }
+
+
+        // test files
+        private static void DefinitionFileTestResults(string file, char delimiter, char txtq, List<string> fileinfo, List<string> columnnames, string newdefinitionfilepath)
+        {
+            List<string> columnnamesupper = new List<string>();
+            foreach (var c in columnnames)
+            {
+                columnnamesupper.Add(c.ToUpper());
+            }
 
             using (StreamReader readfile = new StreamReader(file))
             {
@@ -394,7 +490,7 @@ namespace FileProcessor
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("File number of columns GREATER THAN definition columns.");
                     Console.WriteLine("{0} - extra columns in new file.", columndiff);
-                    
+
 
                     int columncount = 1;
                     foreach (var column in headersplit)
@@ -453,7 +549,7 @@ namespace FileProcessor
 
                         WriteNewDefinitionFile(newdefinitionfilepath, fileinfo, headersplit);
                     }
-                    
+
                 }
 
                 if (morecolumns == true || lesscolumns == true)
@@ -468,11 +564,8 @@ namespace FileProcessor
                 }
             }
 
-            return file;
         }
 
-        
-        // test files
         private static void GenerateTestFile(string inputfile)
         {
             Console.Write("Generate Test File (y/n)?: ");

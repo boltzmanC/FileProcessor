@@ -268,10 +268,17 @@ namespace FileProcessor
             // reappend extension
 
             string reload = "_reload";
-            int firstvalue = 1;
+            int firstvalue = 0;
             int countofvalues = 2;
 
-            string[] filepaths = Directory.GetFiles(targetdirectory); 
+            string[] filepaths = Directory.GetFiles(targetdirectory);
+
+            string newdirectory = targetdirectory + "\\LorealRenamed";
+
+            if (!Directory.Exists(newdirectory))
+            {
+                Directory.CreateDirectory(newdirectory);
+            }
 
             foreach (string file in filepaths)
             {
@@ -283,7 +290,7 @@ namespace FileProcessor
 
                 string[] splitfilename = filename.Split('_');
 
-                string newfilename = string.Join("_", splitfilename, firstvalue, countofvalues) + reload + extension;
+                string newfilename = newdirectory + "\\" + string.Join("_", splitfilename, firstvalue, countofvalues) + reload + extension;
                     //https://www.geeksforgeeks.org/c-sharp-join-method-set-1/
 
                 File.Move(file, newfilename);

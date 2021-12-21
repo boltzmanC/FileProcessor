@@ -9,6 +9,7 @@ namespace FileProcessor
     class LorealDefinitionFileList
     {
         //Loreal
+        public const string LOREAL_ACCT = "LOREAL_ACCT," + @"/users/data/e1platform/loreal/nightly/LOREAL_ACCT_reload.definition";
         public const string LOREAL_BIOL = "LOREAL_BIOL," + @"/users/data/e1platform/loreal/nightly/LOREAL_BIOL_reload.definition";
         public const string LOREAL_CAA = "LOREAL_CAA," + @"/users/data/e1platform/loreal/nightly/LOREAL_CAA_reload.definition";
         public const string LOREAL_CER = "LOREAL_CER," + @"/users/data/e1platform/loreal/nightly/LOREAL_CER_reload.definition";
@@ -29,6 +30,7 @@ namespace FileProcessor
         public const string LOREAL_MUP = "LOREAL_MUP," + @"/users/data/e1platform/loreal/nightly/LOREAL_MUP_reload.definition";
         public const string LOREAL_NYX = "LOREAL_NYX," + @"/users/data/e1platform/loreal/nightly/LOREAL_NYX_reload.definition";
         public const string LOREAL_OAP = "LOREAL_OAP," + @"/users/data/e1platform/loreal/nightly/LOREAL_OAP_reload.definition";
+        public const string LOREAL_PROF = "LOREAL_PROF," + @"/users/data/e1platform/loreal/nightly/LOREAL_PROF_reload.definition";
         public const string LOREAL_PUR = "LOREAL_PUR," + @"/users/data/e1platform/loreal/nightly/LOREAL_PUR_reload.definition";
         public const string LOREAL_RED = "LOREAL_RED," + @"/users/data/e1platform/loreal/nightly/LOREAL_RED_reload.definition";
         public const string LOREAL_SAA = "LOREAL_SAA," + @"/users/data/e1platform/loreal/nightly/LOREAL_SAA_reload.definition";
@@ -36,7 +38,9 @@ namespace FileProcessor
         public const string LOREAL_SCC = "LOREAL_SCC," + @"/users/data/e1platform/loreal/nightly/LOREAL_SCC_reload.definition";
         public const string LOREAL_SKIN = "LOREAL_SKIN," + @"/users/data/e1platform/loreal/nightly/LOREAL_SKIN_reload.definition";
         public const string LOREAL_SSC = "LOREAL_SSC," + @"/users/data/e1platform/loreal/nightly/LOREAL_SSC_reload.definition";
+        public const string LOREAL_THY = "LOREAL_THY," + @"/users/data/e1platform/loreal/nightly/LOREAL_THY_reload.definition";
         public const string LOREAL_UD = "LOREAL_UD," + @"/users/data/e1platform/loreal/nightly/LOREAL_UD_reload.definition";
+        public const string LOREAL_VAL = "LOREAL_VAL," + @"/users/data/e1platform/loreal/nightly/LOREAL_VAL_reload.definition";
         public const string LOREAL_VIC = "LOREAL_VIC," + @"/users/data/e1platform/loreal/nightly/LOREAL_VIC_reload.definition";
         public const string LOREAL_VR = "LOREAL_VR," + @"/users/data/e1platform/loreal/nightly/LOREAL_VR_reload.definition";
         public const string LOREAL_YSL = "LOREAL_YSL," + @"/users/data/e1platform/loreal/nightly/LOREAL_YSL_reload.definition";

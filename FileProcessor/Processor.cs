@@ -41,7 +41,7 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "4. ", "Generate new .definition file.");
                 Console.WriteLine("{0,5}{1,-10}", "5. ", "Get subset of records");
                 Console.WriteLine("{0,5}{1,-10}", "6. ", "Onboarding Sweeper.");
-                //Console.WriteLine("{0,5}{1,-10}", "7. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "7. ", "Loreal _reload file name change");
                 //Console.WriteLine("{0,5}{1,-10}", "8. ", "");
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();
@@ -76,6 +76,10 @@ namespace FileProcessor
                         Sweeper.OnBoardingFTPSweeper();
                         break;
 
+                    case "7":
+                        FunctionTools.LorealChangeFileNamestoReload(FunctionTools.GetADirectory());
+                        break;
+
 
                     // exit
                     case "exit":
@@ -94,3 +98,7 @@ namespace FileProcessor
     }
 
 }
+
+// add ALL directories to onboarding sweeper
+
+// add way to auto detect loreal files.

@@ -249,7 +249,7 @@ namespace FileProcessor
         private static string SaveLocation()
         {
             string directorylookup = @"\\e1sas01\O\OnboardingSweepResults";
-            string savelocation = @"D:\";
+            string savelocation = @"D:\Data";
 
             Console.Write("Save to e1sas01 (y/n)?: ");
             string input = Console.ReadLine().Trim().ToLower();

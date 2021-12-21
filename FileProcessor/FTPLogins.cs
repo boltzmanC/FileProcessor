@@ -63,7 +63,7 @@ namespace FileProcessor
             }
             else
             {
-                StreamReader passcodefile = new StreamReader(@"C:\Users\dwhite\Desktop\Notes\fileprocessorcredentials.txt");
+                StreamReader passcodefile = new StreamReader(@"D:\Users\dwhite\Desktop\Notes\fileprocessorcredentials.txt");
 
                 passcode = passcodefile.ReadLine().Trim();
             }

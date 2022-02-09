@@ -105,33 +105,47 @@ namespace FileProcessor
 
                     int filecount = 0;
 
-                    foreach (RemoteFileInfo fileinfo in directoryinfo.Files)
+                    // read new files.
+                    //targetdirectoryfileinfo(directoryinfo, newfilestodownload, e1analyticssavedfileinfo, e1analyticsftpfileinfo, readresourcefile, filecount);
+
+                    // Enumerate files https://stackoverflow.com/questions/41110384/list-names-of-files-in-ftp-directory-and-its-subdirectories
+                    var options = EnumerationOptions.EnumerateDirectories | EnumerationOptions.AllDirectories;
+                    IEnumerable<RemoteFileInfo> fileinfos = session.EnumerateRemoteFiles(ftpdirectory, null, options);
+                    foreach (var fileinfo in fileinfos)
                     {
-                        if (fileinfo.IsDirectory == false)
+                        //Console.WriteLine(fileInfo.FullName);
+
+                        if (!e1analyticsftpfileinfo.ContainsKey(fileinfo.FullName))
                         {
-                            // store all file info
-                            e1analyticsftpfileinfo.Add(fileinfo.FullName, fileinfo.LastWriteTime);
-
-                            if (e1analyticssavedfileinfo.ContainsKey(fileinfo.FullName) && readresourcefile == true)
+                            if (fileinfo.IsDirectory == false)
                             {
-                                // same file name new version case                            
-                                int compareresult = DateTime.Compare(e1analyticssavedfileinfo[fileinfo.FullName], fileinfo.LastWriteTime);
-
-                                if (compareresult > 0) //https://docs.microsoft.com/en-us/dotnet/api/system.datetime.compare?view=net-5.0#System_DateTime_Compare_System_DateTime_System_DateTime_
-                                {
-                                    newfilestodownload.Add(fileinfo.FullName, fileinfo.LastWriteTime);
-                                }
-                            }
-                            else if (!e1analyticssavedfileinfo.ContainsKey(fileinfo.FullName)) // only add if not already in the save file.
-                            {
-                                // add FULL file name (includes path) and last write time to dictionary.
-                                newfilestodownload.Add(fileinfo.FullName, fileinfo.LastWriteTime);
-                                newfilecount++;
-                            }
-                            filecount++;
+                                e1analyticsftpfileinfo.Add(fileinfo.FullName, fileinfo.LastWriteTime);
+                            }   
                         }
                     }
-                    
+
+                    // compare any same name files and save new file paths to newfilestodownload dictionary
+                    foreach (var fileinfo in e1analyticsftpfileinfo.Keys)
+                    {
+                        if (e1analyticssavedfileinfo.ContainsKey(fileinfo) && readresourcefile == true)
+                        {
+                            // same file name new version case                            
+                            int compareresult = DateTime.Compare(e1analyticssavedfileinfo[fileinfo], e1analyticsftpfileinfo[fileinfo]);
+
+                            if (compareresult > 0) //https://docs.microsoft.com/en-us/dotnet/api/system.datetime.compare?view=net-5.0#System_DateTime_Compare_System_DateTime_System_DateTime_
+                            {
+                                newfilestodownload.Add(fileinfo, e1analyticsftpfileinfo[fileinfo]);
+                            }
+                        }
+                        else if (!e1analyticssavedfileinfo.ContainsKey(fileinfo)) // only add if not already in the save file.
+                        {
+                            // add FULL file name (includes path) and last write time to dictionary.
+                            newfilestodownload.Add(fileinfo, e1analyticsftpfileinfo[fileinfo]);
+                            newfilecount++;
+                        }
+                        filecount++;
+                    }
+
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"There are {filecount} file(s) in the {ftpdirectory} directory.");
@@ -371,5 +385,6 @@ namespace FileProcessor
             Console.ResetColor();
             Console.WriteLine();
         }
+
     }
 }

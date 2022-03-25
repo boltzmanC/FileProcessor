@@ -18,6 +18,7 @@ namespace FileProcessor
         public const string entercomallhh = "entercomallhh," + @"/users/data/e1platform/entercom/nightly/entercom_allhh_reload.definition";
         public const string entercom = "entercom," + @"/users/data/e1platform/entercom/nightly/entercom_hh_reload.definition";
         public const string lorealallhh = "lorealallhh," + @"/users/data/e1platform/loreal/nightly/LOREAL_ALLBRAND_HH_reload.definition";
+        public const string lorealoracleappend = "lorealoracleappend," + @"/users/data/e1platform/loreal/nightly/LOREAL_ORACLEAPPEND_HH_reload.definition";
         public const string michelin = "michelin," + @"/users/data/e1platform/Michelin/nightly/michelin_crm_reload.definition";
         public const string progressive = "progressive," + @"/users/data/e1platform/progressive/nightly/progressive_hh_reload.definition";
         public const string santander = "santander," + @"/users/data/e1platform/santander/nightly/santander_hh_reload.definition";

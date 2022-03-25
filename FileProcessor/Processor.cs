@@ -41,7 +41,7 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "4. ", "Generate new .definition file.");
                 Console.WriteLine("{0,5}{1,-10}", "5. ", "Get subset of records");
                 Console.WriteLine("{0,5}{1,-10}", "6. ", "Onboarding Sweeper.");
-                Console.WriteLine("{0,5}{1,-10}", "7. ", "Loreal _reload file name change");
+                Console.WriteLine("{0,5}{1,-10}", "7. ", "Loreal _reload file name change (do before testing loreal files)");
                 //Console.WriteLine("{0,5}{1,-10}", "8. ", "");
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();

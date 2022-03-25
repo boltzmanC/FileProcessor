@@ -254,7 +254,8 @@ namespace FileProcessor
             else
             {
                 Console.WriteLine("Invalid number entered, try again...");
-                E1PlatformFileTester(); //restart.
+                //E1PlatformFileTester(); //restart.
+                DefinitionFileListMainMenu(definitionfilelookup); // restart same menu.
             }
 
 
@@ -306,7 +307,8 @@ namespace FileProcessor
             else
             {
                 Console.WriteLine("Invalid number entered, try again...");
-                E1PlatformFileTester(); //restart.
+                //E1PlatformFileTester(); //restart. main menu.
+                DefinitionFileListLorealMenu(definitionfilelookup); //loreal menu
             }
 
             return definitionfilepath;
@@ -315,8 +317,10 @@ namespace FileProcessor
         private static string DownloadAndTestDefinitionFile(Session session, string definitionfilepath)
         {
             //download definition file.
-            string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
+            string tempdefinitionfile = Directory.GetCurrentDirectory() + "\\tempdefinitionfile.definition"; //saved in debug folder.
 
+            //File.Create(tempdefinitionfile);
+            
             session.GetFiles(definitionfilepath, tempdefinitionfile);
 
             List<string> fileinfo = new List<string>();
@@ -341,9 +345,9 @@ namespace FileProcessor
             }
 
             //delete temp definition file.
-            if (File.Exists(@"tempdefintionfile.definition"))
+            if (File.Exists(@"tempdefinitionfile.definition"))
             {
-                File.Delete(@"tempdefintionfile.definition");
+                File.Delete(@"tempdefinitionfile.definition");
             }
 
             //show current definition file being tested.
@@ -395,6 +399,17 @@ namespace FileProcessor
                 }
             }
 
+            //get loreal home
+            Console.WriteLine();
+            Console.Write("Enter parent Direcotry of Loreal Files to test: ");
+
+            string lorealfilehome = FunctionTools.GetADirectory();
+            char delimiter = FunctionTools.GetDelimiter();
+            char txtq = FunctionTools.GetTXTQualifier();
+            
+            //rename loreal files.
+            //FunctionTools.LorealChangeFileNamestoReload(lorealfilehome); //removed to allow multiple restarts. this step now needs to be done before testing.
+
             //delete temp definition file.
             if (File.Exists(@"tempdefintionfile.definition"))
             {
@@ -408,18 +423,7 @@ namespace FileProcessor
             Console.WriteLine($"    {definitionfilename} - definition file selected");
             Console.WriteLine();
             Console.ResetColor();
-
-            //get loreal home
-            Console.WriteLine();
-            Console.Write("Enter parent Direcotry of Loreal Files to test: ");
-
-            string lorealfilehome = FunctionTools.GetADirectory();
-            char delimiter = FunctionTools.GetDelimiter();
-            char txtq = FunctionTools.GetTXTQualifier();
-
-            //rename loreal files.
-            FunctionTools.LorealChangeFileNamestoReload(lorealfilehome);
-
+            
             //Get file to test
             string[] filepaths = Directory.GetFiles(lorealfilehome);
 

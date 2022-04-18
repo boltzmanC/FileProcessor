@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalTools.cs" />
     <Compile Include="Decryption.cs" />
     <Compile Include="DefinitionFileList.cs" />
     <Compile Include="DefinitionFileTester.cs" />

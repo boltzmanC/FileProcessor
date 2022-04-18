@@ -42,7 +42,8 @@ namespace FileProcessor
                 Console.WriteLine("{0,5}{1,-10}", "5. ", "Get subset of records");
                 Console.WriteLine("{0,5}{1,-10}", "6. ", "Onboarding Sweeper.");
                 Console.WriteLine("{0,5}{1,-10}", "7. ", "Loreal _reload file name change (do before testing loreal files)");
-                //Console.WriteLine("{0,5}{1,-10}", "8. ", "");
+                Console.WriteLine("{0,5}{1,-10}", "8. ", "Multiple File Unique Value Check.");
+                
                 Console.WriteLine("{0,5}{1,-10}", "exit. ", "End Program.");
                 Console.WriteLine();
                 Console.ResetColor();
@@ -80,7 +81,9 @@ namespace FileProcessor
                         FunctionTools.LorealChangeFileNamestoReload(FunctionTools.GetADirectory());
                         break;
 
-
+                    case "8":
+                        AdditionalTools.MultiFileUniqueValueCheck();
+                        break;
                     // exit
                     case "exit":
                         done = true; // we are done but manually exit app here.

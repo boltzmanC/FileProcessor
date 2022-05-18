@@ -69,50 +69,55 @@ namespace FileProcessor
                     while ((line = targetfile.ReadLine()) != null)
                     {
                         string[] linesplit = FunctionTools.SplitLineWithTxtQualifier(line, deli, txtq, false);
-                        string id = linesplit[recordidindex];
-
-                        if (currentfilecounts.ContainsKey(id))
+                        
+                        if (linesplit.Count() > recordidindex) // test line length. 
                         {
-                            currentfilecounts[id]++; //add count 
-                        }
-                        else
-                        {
-                            currentfilecounts.Add(id, 1); // new dict key
-                        }
+                            string id = linesplit[recordidindex];
 
-                        countlines++;
+                            if (currentfilecounts.ContainsKey(id))
+                            {
+                                currentfilecounts[id]++; //add count 
+                            }
+                            else
+                            {
+                                currentfilecounts.Add(id, 1); // new dict key
+                            }
+
+                            countlines++;
+                        }
+                        
                     }
                 }
 
                 // check values against alluniques
-                foreach (var id in currentfilecounts.Keys)
+                foreach (KeyValuePair<string, int> kvp in currentfilecounts)
                 {
-                    if (alluniques.ContainsKey(id)) //update current values.
+                    if (alluniques.ContainsKey(kvp.Key)) //update current values.
                     {
                         // get existing values from alluniques
-                        List<string> currentvalues = alluniques[id]; 
+                        List<string> currentvalues = alluniques[kvp.Key]; 
 
                         //update id count
                         int currenttotal = Int32.Parse(currentvalues[0]);
-                        currenttotal += currentfilecounts[id]; //use count of dupes from curent file if any.
+                        currenttotal += kvp.Value; //use count of dupes from curent file if any.
                         currentvalues[0] = currenttotal.ToString(); // update current total
 
                         // add new filename
                         currentvalues.Add(filename);
 
                         // update values
-                        alluniques[id] = currentvalues;
+                        alluniques[kvp.Key] = currentvalues;
                     }
                     else
                     {
                         // build list of values
                         List<string> valuestoadd = new List<string> ();
 
-                        valuestoadd.Add(currentfilecounts[id].ToString());
+                        valuestoadd.Add(kvp.Value.ToString());
                         valuestoadd.Add(filename);
 
                         // update allunique dictionary
-                        alluniques.Add(id, valuestoadd);
+                        alluniques.Add(kvp.Key, valuestoadd);
                     }
                 }
 
@@ -124,6 +129,7 @@ namespace FileProcessor
                 Console.WriteLine($"unique IDs - { currentfilecounts.Keys.Count}");
                 Console.ResetColor();
 
+                currentfilecounts.Clear();
             }
 
             // output results
@@ -135,15 +141,15 @@ namespace FileProcessor
                 // write headers
                 outfile.WriteLine("ID|Count|Files");
                 
-                foreach (var id in alluniques.Keys)
+                foreach (KeyValuePair<string, List<string>> kvp in alluniques)
                 {
                     // linebuilder
                     List<string> linebuilder = new List<string>();
 
-                    linebuilder.Add(id);
+                    linebuilder.Add(kvp.Key);
 
                     // build rest of line.
-                    List<string> savedvalues = alluniques[id];
+                    List<string> savedvalues = kvp.Value;
                     
                     linebuilder.Add(savedvalues[0]); // add count.
 

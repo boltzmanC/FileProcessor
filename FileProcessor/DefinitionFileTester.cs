@@ -318,8 +318,9 @@ namespace FileProcessor
         {
             //download definition file.
             string tempdefinitionfile = Directory.GetCurrentDirectory() + "\\tempdefinitionfile.definition"; //saved in debug folder.
-
             //File.Create(tempdefinitionfile);
+
+            
             
             session.GetFiles(definitionfilepath, tempdefinitionfile);
 

@@ -57,6 +57,7 @@
     <Compile Include="DefinitionFileList.cs" />
     <Compile Include="DefinitionFileTester.cs" />
     <Compile Include="FTPLogins.cs" />
+    <Compile Include="FTPUpload.cs" />
     <Compile Include="FunctionTools.cs" />
     <Compile Include="LorealDefinitionFileList.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

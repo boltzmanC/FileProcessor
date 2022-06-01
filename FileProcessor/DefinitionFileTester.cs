@@ -65,7 +65,7 @@ namespace FileProcessor
                         LorealDownloadAndTestDefinitionFile(session, path);
                         
                         //reset value.
-                        testingloreal = false;
+                        //testingloreal = false;
                     }
                     else
                     {
@@ -374,6 +374,13 @@ namespace FileProcessor
 
         private static void LorealDownloadAndTestDefinitionFile(Session session, string definitionfilepath)
         {
+            // need to rewrite to do the loops within this function. 
+            // E1PlatformSelectDefinitionFilenew() needs to not loop through definition files 
+            // loop needs to be moved to this function.
+            // need to change how ALL LOREAL files is selected
+
+
+
             //download definition file.
             string tempdefinitionfile = "tempdefintionfile.definition"; //saved in debug folder.
 
@@ -430,12 +437,21 @@ namespace FileProcessor
 
             foreach (var f in filepaths)
             {
-                string newdefinitionfilepath = Directory.GetParent(f) + "\\" + "NEW_" + definitionfilepath.Split('/').Last();
+                // look at one loreal file because we are already looping through the definition file paths
+                // @"/users/data/e1platform/loreal/nightly/LOREAL_ACCT_reload.definition";
 
-                DefinitionFileTestResults(f, delimiter, txtq, fileinfo, columnnames, newdefinitionfilepath);
+                // test file path to match definition file name
+                string defininitionnamenoexe = FunctionTools.GetFileNameWithoutExtension(definitionfilename);
+                string filenamenoexe = FunctionTools.GetFileNameWithoutExtension(f);
+                if (defininitionnamenoexe == filenamenoexe)
+                {
+                    string newdefinitionfilepath = Directory.GetParent(f) + "\\" + "NEW_" + definitionfilepath.Split('/').Last(); 
 
-                //Generate test file
-                GetSubsetOfRecords(f);
+                    DefinitionFileTestResults(f, delimiter, txtq, fileinfo, columnnames, newdefinitionfilepath);
+
+                    //Generate test file
+                    GetSubsetOfRecords(f);
+                }
             }
         }
 
@@ -712,6 +728,7 @@ namespace FileProcessor
             string skipfirstrow = "true";
             string purgedefinition = "false";
             string operationmonitorhours = "17";
+            string failheaderdiff = "false";
             string emailresultsto = "dylan.white@team.neustar,e1@support.neustar";
 
 
@@ -745,6 +762,7 @@ namespace FileProcessor
                 writefile.WriteLine($"textqualifier = {txtq}");
                 writefile.WriteLine($"purgedefinition = {purgedefinition}");
                 writefile.WriteLine($"operationmonitorhours = {operationmonitorhours}");
+                writefile.WriteLine($"failIfHeaderDiff = {failheaderdiff}");
                 writefile.WriteLine($"emailresultsto = {emailresultsto}");
                 
                 //columnfields

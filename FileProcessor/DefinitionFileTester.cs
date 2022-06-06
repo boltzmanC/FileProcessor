@@ -769,6 +769,10 @@ namespace FileProcessor
                 for (int i = 1; i <= columnnames.Count(); i++)
                 {
                     writefile.WriteLine($"column{i}.fieldname = {columnnames[i - 1]}");
+                    writefile.WriteLine($"column{i}.header = {columnnames[i - 1]}");
+                    // todo
+                    // add string and number test
+                    // add label test
                 }
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
